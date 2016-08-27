@@ -1,0 +1,19 @@
+{
+  "name": "parser-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "start": "node ./dist/bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ts-loader": "^0.8.2",
+    "typescript": "^2.0.0",
+    "underscore": "^1.8.3",
+    "webpack": "^1.13.2"
+  }
+}
