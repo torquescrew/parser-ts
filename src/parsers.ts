@@ -24,7 +24,7 @@ export const ident = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
 
 export function char(c: string): Parser<string | NoResult> {
   return (input: Input) => {
-    var r = input.nextChar();
+    let r = input.nextChar();
 
     if (r === c) {
       input.advance();
@@ -102,31 +102,34 @@ export function or(...args: Parser<any>[]): Parser<any> {
   };
 }
 
-export function and(parser0: Parser<any>, parser1: Parser<any>): Parser<[string] | null> {
+export function and(p1: Parser<any>, p2: Parser<any>): Parser<[string] | NoResult> {
   return (input: Input) => {
     const pos = input.getPosition();
 
-    const result0 = applyParser(parser0, input);
-    if (result0 === null) {
+    const r1 = applyParser(p1, input);
+    if (r1 === noResult) {
       input.setPosition(pos);
-      return null;
+      
+      return noResult;
     }
 
-    const result1 = applyParser(parser1, input);
-    if (result1 === null) {
+    const r2 = applyParser(p2, input);
+    if (r2 === noResult) {
       input.setPosition(pos);
-      return null;
+      
+      return noResult;
     }
-    return [result0, result1];
+    return [r1, r2];
   };
 }
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
 export function seq(...args: any[]) {
-  var parsers: Parser<any>[] = [];
-  for (var i = 0; i < arguments.length; i++) {
-    var arg = arguments[i];
+  let parsers: Parser<any>[] = [];
+  
+  for (let i = 0; i < args.length; i++) {
+    let arg = args[i];
 
     if (util.isString(arg)) {
       parsers[i] = word(arg);
@@ -136,29 +139,30 @@ export function seq(...args: any[]) {
     }
   }
 
-  return (function (input) {
-    var pos = input.getPosition();
-    var results: Parser<any>[] = [];
+  return (input: Input) => {
+    const pos = input.getPosition();
+    let results: Parser<any>[] = [];
 
-    for (var i = 0; i < parsers.length; i++) {
-      var result = applyParser(parsers[i], input);
-      if (result === null) {
+    for (let i = 0; i < parsers.length; i++) {
+      let result = applyParser(parsers[i], input);
+
+      if (result === noResult) {
         input.setPosition(pos);
-        return null;
+        return noResult;
       }
       else if (result !== '') {
         results.push(result);
       }
     }
     return results;
-  });
+  };
 }
 
 export function many(parser) {
   return (function (input) {
-    var results: Parser<any>[] = [];
+    let results: Parser<any>[] = [];
 
-    var result = applyParser(parser, input);
+    let result = applyParser(parser, input);
     while (result !== null) {
       results.push(result);
       result = applyParser(parser, input);
@@ -169,7 +173,7 @@ export function many(parser) {
 
 export function many1(parser) {
   return (function (input) {
-    var results = applyParser(many(parser), input);
+    let results = applyParser(many(parser), input);
     if (results.length > 0) {
       return results;
     }
@@ -177,16 +181,16 @@ export function many1(parser) {
   });
 }
 
-export function repSep(parser, separator) {
-  return (function (input) {
-    var results: Parser<any>[] = [];
-    var sepParser = seq(__, word(separator), __);
+export function repSep(parser: Parser<any>, separator: string) {
+  return (input: Input) => {
+    let results: Parser<any>[] = [];
+    let sepParser = seq(__, word(separator), __);
 
-    var result = applyParser(parser, input);
-    while (result !== null) {
+    let result = applyParser(parser, input);
+    while (result !== noResult) {
       results.push(result);
 
-      var sepRes = applyParser(sepParser, input);
+      let sepRes = applyParser(sepParser, input);
       if (sepRes !== null) {
         result = applyParser(parser, input);
       }
@@ -198,7 +202,7 @@ export function repSep(parser, separator) {
       return null;
 
     return results;
-  });
+  };
 }
 
 
@@ -215,9 +219,9 @@ export function applyParser(parser, input: Input) {
 export function not(parser) {
   return (function (input) {
     //input.savePosition();
-    var pos = input.getPosition();
+    let pos = input.getPosition();
 
-    var result = applyParser(parser, input);
+    let result = applyParser(parser, input);
     if (result !== null) {
       //input.restorePosition();
       input.setPosition(pos);
@@ -230,7 +234,7 @@ export function not(parser) {
 
 export function apply(parser, f) {
   return (function (input) {
-    var result = applyParser(parser, input);
+    let result = applyParser(parser, input);
 
     if (result == null) {
       return null;
@@ -242,9 +246,9 @@ export function apply(parser, f) {
 }
 
 export function parseAll(parserIn, input) {
-  var inputObj = new Input(input);
+  let inputObj = new Input(input);
 
-  var res = applyParser(parserIn, inputObj);
+  let res = applyParser(parserIn, inputObj);
 
   if (res === null) {
     console.log('null!!!!!');
@@ -253,8 +257,8 @@ export function parseAll(parserIn, input) {
 }
 
 export function parseAndPrint(parserIn, input) {
-  var inputObj = new Input(input);
-  var result = applyParser(parserIn, inputObj);
+  let inputObj = new Input(input);
+  let result = applyParser(parserIn, inputObj);
   console.log(result);
 }
 
@@ -269,19 +273,19 @@ export function logParser(parser, print) {
 
 
 function tests() {
-  var parser = or(and(char('a'), char('b')), and(char('c'), char('d')));
+  let parser = or(and(char('a'), char('b')), and(char('c'), char('d')));
 
-  var stuff = and(word('hey'), __);
+  let stuff = and(word('hey'), __);
 
-  var abbba = regex(/ab+c/);
+  let abbba = regex(/ab+c/);
 
-  var multi = seq(word('def'), __, word('hi'));
+  let multi = seq(word('def'), __, word('hi'));
 
-  var theMany = many(word('hi'));
+  let theMany = many(word('hi'));
 
-  var joined = seq(theMany, multi);
+  let joined = seq(theMany, multi);
 
-  var regexSeq = seq(word('def'), regex(/a+c/), word('word'));
+  let regexSeq = seq(word('def'), regex(/a+c/), word('word'));
 
   console.log(parseAll(parser, 'ab'));
   console.log(parseAll(parser, 'cd'));
