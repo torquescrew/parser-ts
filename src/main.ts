@@ -1,10 +1,7 @@
-import {Input} from './input';
-import './parsers';
-
+import * as clike from './c-like-parser';
+import './parsers-m';
 
 function main() {
-    const input = new Input('wawawa');
-
-    console.log('hello world');
+  // clike.test();
 }
 main();

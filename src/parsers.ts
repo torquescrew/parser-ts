@@ -11,15 +11,14 @@ export type NoResult = null;
 export const noResult: NoResult = null;
 
 
-const a: RegExp = /-?(\d+(\.\d+)?)/;
+export const __: Parser<string> = optionalWhiteSpace();
 
-export const __ = optionalWhiteSpace();
+export const number: Parser<string|NoResult> = regex(/-?(\d+(\.\d+)?)/);
 
-export const number = regex(/-?(\d+(\.\d+)?)/);
+export const stringLiteral: Parser<string|NoResult> = regex(/"([^"\\]|\\.)*"/);
 
-export const stringLiteral = regex(/"([^"\\]|\\.)*"/);
+export const ident: Parser<string|NoResult> = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
 
-export const ident = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
 
 
 export function char(c: string): Parser<string | NoResult> {
@@ -102,7 +101,7 @@ export function or(...args: Parser<any>[]): Parser<any> {
   };
 }
 
-export function and(p1: Parser<any>, p2: Parser<any>): Parser<[string] | NoResult> {
+export function and(p1: Parser<any>, p2: Parser<any>): Parser<string[] | NoResult> {
   return (input: Input) => {
     const pos = input.getPosition();
 
@@ -119,25 +118,16 @@ export function and(p1: Parser<any>, p2: Parser<any>): Parser<[string] | NoResul
       
       return noResult;
     }
-    return [r1, r2];
+    return [r1, r2].filter(r => r !== '');
   };
 }
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
-export function seq(...args: any[]) {
-  let parsers: Parser<any>[] = [];
-  
-  for (let i = 0; i < args.length; i++) {
-    let arg = args[i];
-
-    if (util.isString(arg)) {
-      parsers[i] = word(arg);
-    }
-    else {
-      parsers[i] = arg;
-    }
-  }
+export function seq(...args: Array<Parser<any> | string>) {
+  const parsers: Parser<any>[] = args.map((arg) => {
+    return util.isString(arg) ? word(arg as string) as Parser<any> : arg as Parser<any>;
+  });
 
   return (input: Input) => {
     const pos = input.getPosition();
@@ -217,19 +207,17 @@ export function applyParser(parser, input: Input) {
 
 // Doesn't advance position
 export function not(parser) {
-  return (function (input) {
-    //input.savePosition();
-    let pos = input.getPosition();
+  return (input: Input) => {
+    const pos = input.getPosition();
+    const result = applyParser(parser, input);
 
-    let result = applyParser(parser, input);
     if (result !== null) {
-      //input.restorePosition();
       input.setPosition(pos);
-      return null;
+
+      return noResult;
     }
-    //input.setPosition(pos);
     return '';
-  });
+  };
 }
 
 export function apply(parser, f) {
@@ -300,4 +288,4 @@ function tests() {
   console.log(parseAll(or(word('hello'), word('hi'), word('bye')), 'hi bye'));
   console.log(parseAll(repSep(word('hi'), ', '), "hi, hi, hi"));
 }
-tests();
+// tests();

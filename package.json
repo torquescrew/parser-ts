@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/parsimmon": "^0.5.28",
+    "parsimmon": "^0.9.2",
     "ts-loader": "^0.8.2",
     "typescript": "^2.0.0",
     "underscore": "^1.8.3",
