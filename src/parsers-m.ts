@@ -27,7 +27,7 @@ function mkParser(applyFunc: (Input, Function) => any): IParser {
     apply: (input: Input) => {
       return applyFunc(input, handleResult);
     },
-    map: (f: Function) => {
+    map: (f: (result: any) => any) => {
       mapFunc = f;
 
       return self;
@@ -37,7 +37,7 @@ function mkParser(applyFunc: (Input, Function) => any): IParser {
   return self;
 }
 
-function char(c: string): IParser {
+export function char(c: string): IParser {
   return mkParser((input: Input, handleResult) => {
     let r = input.nextChar();
 
@@ -48,6 +48,24 @@ function char(c: string): IParser {
       result = c;
     }
     return handleResult(result);
+  });
+}
+
+export function word(str: string): IParser {
+  return mkParser((input: Input, handleResult) => {
+    const charList = str.split('');
+    const pos = input.getPosition();
+
+    for (let i = 0; i < charList.length; i++) {
+      if (input.nextChar() === charList[i]) {
+        input.advance();
+      }
+      else {
+        input.setPosition(pos);
+        return noResult;
+      }
+    }
+    return handleResult(str);
   });
 }
 
@@ -73,19 +91,48 @@ export function and(p1: IParser, p2: IParser) {
 }
 
 
+// Array returned doesn't contain '' values.
+// Auto converts plain strings to word parsers.
+export function seq(...args: Array<IParser | string>) {
+  const parsers: IParser[] = args.map((arg) => {
+    return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
+  });
+
+  return mkParser((input: Input, handleResult) => {
+    const pos = input.getPosition();
+    let results = [];
+
+    for (let i = 0; i < parsers.length; i++) {
+      let result = applyParser(parsers[i], input);
+
+      if (result === noResult) {
+        input.setPosition(pos);
+        return noResult;
+      }
+      else if (result !== '') {
+        results.push(result);
+      }
+    }
+    return handleResult(results);
+  });
+}
+
 function test() {
-  const c = char('c').map(r => console.log(r));
-  const input = new Input('bc');
 
-  const bc = and(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')});
+  parseAndPrint(and(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')}), 'bc');
+  parseAndPrint(word('charles').map(r => 'yay!'), 'charles');
+  parseAndPrint(seq('ch', 'ar', 'les'), 'charles');
+  parseAndPrint(seq('ch', 'ar', 'les').map(r => r.join('')), 'charles');
 
-  const result = applyParser(bc, input);
-
-  console.log('result: ', result);
 }
 test();
 
+export function parseAndPrint(parser: IParser, text: string) {
+  let input = new Input(text);
+  let result = applyParser(parser, input);
+  console.log(result);
+}
 
-export function applyParser(parser, input) {
+export function applyParser(parser: IParser, input: Input) {
   return parser.apply(input);
 }
