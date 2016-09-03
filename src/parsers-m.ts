@@ -11,10 +11,10 @@ interface IParser {
   map: (Function) => IParser;
 }
 
-function mkParser(applyFunc): IParser {
-  let mapFunc: Function;
+function mkParser(applyFunc: (Input, Function) => any): IParser {
+  let mapFunc: (result: any) => any;
 
-  let handleResult = (result) => {
+  let handleResult = (result: any) => {
     if (mapFunc) {
       return mapFunc(result);
     }
@@ -23,7 +23,7 @@ function mkParser(applyFunc): IParser {
     }
   };
 
-  let self = {
+  let self: IParser = {
     apply: (input: Input) => {
       return applyFunc(input, handleResult);
     },
@@ -47,7 +47,6 @@ function char(c: string): IParser {
       input.advance();
       result = c;
     }
-
     return handleResult(result);
   });
 }
@@ -56,14 +55,14 @@ export function and(p1: IParser, p2: IParser) {
   return mkParser((input: Input, handleResult) => {
     const pos = input.getPosition();
 
-    const r1 = applyParser2(p1, input);
+    const r1 = applyParser(p1, input);
     if (r1 === noResult) {
       input.setPosition(pos);
 
       return noResult;
     }
 
-    const r2 = applyParser2(p2, input);
+    const r2 = applyParser(p2, input);
     if (r2 === noResult) {
       input.setPosition(pos);
 
@@ -74,19 +73,19 @@ export function and(p1: IParser, p2: IParser) {
 }
 
 
-function testPromises() {
+function test() {
   const c = char('c').map(r => console.log(r));
   const input = new Input('bc');
 
   const bc = and(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')});
 
-  const result = applyParser2(bc, input);
+  const result = applyParser(bc, input);
 
   console.log('result: ', result);
 }
-testPromises();
+test();
 
 
-export function applyParser2(parser, input) {
+export function applyParser(parser, input) {
   return parser.apply(input);
 }
