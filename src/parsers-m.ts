@@ -62,6 +62,163 @@ export function char(c: string): LeParser {
   return self;
 }
 
+export function char3(c: string) {
+  return (input: Input) => {
+
+    let self = {
+      then: (f: Function) => {
+        let r = input.nextChar();
+
+        if (r === c) {
+          input.advance();
+          f(c);
+        }
+        else {
+          f(noResult);
+        }
+        return self
+      }
+    };
+
+    return self;
+  }
+}
+
+interface IParser {
+  apply: (Input) => any;
+  map: (Function) => IParser;
+}
+
+export function char5(c: string): IParser {
+  let mapFunc: Function;
+
+  let self = {
+    apply: (input: Input) => {
+      let r = input.nextChar();
+
+      let result: any | null = noResult;
+
+      if (r === c) {
+        input.advance();
+        result = c;
+      }
+
+      if (mapFunc) {
+        return mapFunc(result);
+      }
+      else {
+        return result;
+      }
+    },
+
+    map: (f: Function) => {
+      mapFunc = f;
+
+      return self;
+    },
+  };
+
+  return self;
+}
+
+function mkParser(applyFunc): IParser {
+  let mapFunc: Function;
+
+  let handleResult = (result) => {
+    if (mapFunc) {
+      return mapFunc(result);
+    }
+    else {
+      return result;
+    }
+  };
+
+  let self = {
+    apply: (input: Input) => {
+      return applyFunc(input, handleResult);
+    },
+    map: (f: Function) => {
+      mapFunc = f;
+
+      return self;
+    },
+  };
+
+  return self;
+}
+
+function char7(c: string): IParser {
+  return mkParser((input: Input, handleResult) => {
+    let r = input.nextChar();
+
+    let result: any | null = noResult;
+
+    if (r === c) {
+      input.advance();
+      result = c;
+    }
+
+    return handleResult(result);
+  });
+}
+
+
+abstract class CParser {
+  mapFunc: Function;
+
+  abstract apply(input: Input): CParser;
+
+  map(f: Function): CParser {
+    this.mapFunc = f;
+
+    return this;
+  }
+
+  getResult(result) {
+    if (this.mapFunc) {
+      return this.mapFunc(result);
+    }
+    else {
+      return result;
+    }
+  }
+}
+
+class Char extends CParser {
+  c: string;
+
+  constructor(c) {
+    super();
+    this.c = c;
+  }
+
+  apply(input: Input): CParser {
+    let r = input.nextChar();
+
+    let result: any | null = noResult;
+
+    if (r === this.c) {
+      input.advance();
+      result = this.c;
+    }
+
+    return this.getResult(result);
+  }
+}
+
+
+export function char2(c: string) {
+  return (input: Input) => new Promise((resolve, reject) => {
+    let r = input.nextChar();
+
+    if (r === c) {
+      input.advance();
+      resolve(c);
+    }
+    resolve(undefined);
+  })
+}
+
 export function and(p1: LeParser, p2: LeParser) {
   let result: any | NoResult = noResult;
 
@@ -97,18 +254,20 @@ export function and(p1: LeParser, p2: LeParser) {
 }
 
 function testPromises() {
-  const c = char('c');
-  const inp = new Input('cb');
+  const c = char7('c').map(r => console.log(r));
+  const input = new Input('c');
 
-  const p = and(char('c'), char('b')).then((r) => {
-    console.log(r);
-  });
 
-  applyParser(p, inp).then(r => {
-    console.log(r);
-  });
+  const result = applyParser2(c, input);
+
+  console.log('result: ', result);
 }
 testPromises();
+
+
+export function applyParser2(parser, input) {
+  return parser.apply(input);
+}
 
 export function applyParser(parser: LeParser, input: Input): LeParser {
   return parser.apply(input);
