@@ -1,3 +1,6 @@
+# Ideas
+
+### Syntax
 ```python
 data Entities =
   current: Entity[]
@@ -45,7 +48,7 @@ def initEntity(name: EntityName): Entity =
   factory..getEntity(name) # getEntity(factory, name);
 ```
 
-#### How to return modified objects?
+### How to return modified objects?
 ```javascript
 
 var obj = {
