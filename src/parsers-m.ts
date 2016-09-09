@@ -90,6 +90,23 @@ export function and(p1: IParser, p2: IParser) {
   });
 }
 
+export function or(...args: Array<IParser | string>) {
+  const parsers: IParser[] = args.map((arg) => {
+    return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
+  });
+
+  return mkParser((input: Input, handleResult) => {
+    for (let i = 0; i < parsers.length; i++) {
+      const result = applyParser(parsers[i], input);
+
+      if (result !== noResult) {
+        return handleResult(result);
+      }
+    }
+    return noResult;
+  });
+}
+
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
