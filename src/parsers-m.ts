@@ -5,6 +5,16 @@ import * as util from './util';
 export type NoResult = null;
 export const noResult: NoResult = null;
 
+export const __: IParser = optionalWhiteSpace();
+
+export const number: IParser = regex(/-?(\d+(\.\d+)?)/);
+
+export const stringLiteral: IParser = regex(/"([^"\\]|\\.)*"/);
+
+export const ident: IParser = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
+
+
+type MapFunc = (any) => any;
 
 interface IParser {
   apply: (Input) => any;
@@ -12,7 +22,7 @@ interface IParser {
 }
 
 function mkParser(applyFunc: (Input, Function) => any): IParser {
-  let mapFunc: (result: any) => any;
+  let mapFunc: MapFunc;
 
   let handleResult = (result: any) => {
     if (mapFunc) {
@@ -27,7 +37,7 @@ function mkParser(applyFunc: (Input, Function) => any): IParser {
     apply: (input: Input) => {
       return applyFunc(input, handleResult);
     },
-    map: (f: (result: any) => any) => {
+    map: (f: MapFunc) => {
       mapFunc = f;
 
       return self;
@@ -66,6 +76,32 @@ export function word(str: string): IParser {
       }
     }
     return handleResult(str);
+  });
+}
+
+export function optionalWhiteSpace() {
+  return mkParser((input: Input, handleResult) => {
+    while (input.nextChar() === '') {
+      input.advance();
+    }
+
+    return handleResult('');
+  });
+}
+
+export function regex(re: RegExp) {
+  return mkParser((input: Input, handleResult: MapFunc) => {
+    const code = input.rest();
+    const match = re.exec(code);
+
+    if (match !== null && match.index === 0) {
+      const result = match[0];
+      input.advanceBy(result.length);
+      return handleResult(result);
+    }
+    else {
+      return noResult;
+    }
   });
 }
 
@@ -117,7 +153,7 @@ export function seq(...args: Array<IParser | string>) {
 
   return mkParser((input: Input, handleResult) => {
     const pos = input.getPosition();
-    let results = [];
+    let results: any[] = [];
 
     for (let i = 0; i < parsers.length; i++) {
       let result = applyParser(parsers[i], input);
