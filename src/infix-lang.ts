@@ -1,7 +1,10 @@
-import {char, word, or, seq, ident, and, not, __, parseAndPrint} from './parsers-m';
+import {
+  char, word, or, seq, ident, not, __, many, parseAndPrint, stringLiteral,
+  number
+} from './parser-lib/parsers-m';
 import {IInputData} from "./input";
+import {IParser} from "./parser-lib/types";
 
-const expr = () => or(identifier);
 
 const _true = word('true');
 const _false = word('false');
@@ -12,7 +15,10 @@ const _semi = char(';');
 
 const reserved = or(_true, _false, _let, _fun, _equals, _semi);
 
-var identifier = and(not(reserved), ident);
+const cBool = or(_true, _false);
+
+const primitive = or(number, stringLiteral, cBool);
+const identifier = seq(not(reserved), ident);
 
 const defVar = seq(_let, __, identifier, __, _equals, __, expr).fail((inputData: IInputData, args) => {
   const parserIndex = args[0];
@@ -23,8 +29,15 @@ const defVar = seq(_let, __, identifier, __, _equals, __, expr).fail((inputData:
   }
 });
 
+const statement: IParser = seq(__, expr, _semi, __);
+
+const block = seq('{', __, many(statement), __, '}');
+
+function expr() {
+  return or(identifier, defVar, primitive);
+}
 
 export function test() {
-  // parseAndPrint(defVar, 'let a = b');
-  parseAndPrint(defVar, 'let a = b');
+  parseAndPrint(statement, 'let a = 5;');
+  parseAndPrint(block, '{ let a = 5; let b = 6; }');
 }

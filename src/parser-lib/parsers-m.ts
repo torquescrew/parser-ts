@@ -1,9 +1,7 @@
-import {Input, IInputData} from './input';
-import * as util from './util';
+import {Input} from "../input";
+import * as util from "../util";
+import {noResult, SuccessFunc, FailFunc, RawParser, WrappedParser, IParser, IParser2, mkParser} from "./types";
 
-
-export type NoResult = null;
-export const noResult: NoResult = null;
 
 export const __: IParser = optionalWhiteSpace();
 
@@ -13,65 +11,6 @@ export const stringLiteral: IParser = regex(/"([^"\\]|\\.)*"/);
 
 export const ident: IParser = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
 
-type ParserResult = any;
-
-
-type SuccessFunc = (result: ParserResult) => any;
-type FailFunc = (input: IInputData, ...extra: any[]) => any;
-
-interface RawParser {
-  apply: (input: Input) => any;
-  map: (success: SuccessFunc) => IParser;
-  fail: (fail: FailFunc) => IParser;
-}
-
-type WrappedParser = (() => RawParser);
-
-type IParser2 = RawParser | WrappedParser;
-
-type IParser = RawParser;
-
-
-function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure: FailFunc) => any): IParser {
-  let mapFunc: SuccessFunc;
-  let failFunc: FailFunc;
-
-  let handleFail = (input, ...args) => {
-    if (failFunc) {
-      return failFunc(input, args);
-    }
-    else {
-      return noResult;
-    }
-  };
-
-  let handleResult = (result: any) => {
-    if (mapFunc) {
-      return mapFunc(result);
-    }
-    else {
-      return result;
-    }
-  };
-
-  let self: IParser = {
-    apply: (input: Input) => {
-      return applyFunc(input, handleResult, handleFail);
-    },
-    map: (f: SuccessFunc) => {
-      mapFunc = f;
-
-      return self;
-    },
-    fail: (f: FailFunc) => {
-      failFunc = f;
-
-      return self;
-    }
-  };
-
-  return self;
-}
 
 export function char(c: string): IParser {
   return mkParser((input: Input, handleResult) => {
@@ -105,7 +44,7 @@ export function word(str: string): IParser {
   });
 }
 
-export function optionalWhiteSpace() {
+export function optionalWhiteSpace(): IParser {
   return mkParser((input: Input, handleResult) => {
     while (input.nextChar() === ' ') {
       input.advance();
@@ -115,7 +54,7 @@ export function optionalWhiteSpace() {
   });
 }
 
-export function regex(re: RegExp) {
+export function regex(re: RegExp): IParser {
   return mkParser((input: Input, success: SuccessFunc) => {
     const code = input.rest();
     const match = re.exec(code);
@@ -131,28 +70,28 @@ export function regex(re: RegExp) {
   });
 }
 
-export function and(p1: IParser, p2: IParser) {
-  return mkParser((input: Input, success, fail) => {
-    const pos = input.getPosition();
+// export function and(p1: IParser, p2: IParser): IParser {
+//   return mkParser((input: Input, success, fail) => {
+//     const pos = input.getPosition();
+//
+//     const r1 = applyParser(p1, input);
+//     if (r1 === noResult) {
+//       input.setPosition(pos);
+//
+//       return noResult;
+//     }
+//
+//     const r2 = applyParser(p2, input);
+//     if (r2 === noResult) {
+//       input.setPosition(pos);
+//
+//       return noResult;
+//     }
+//     return success([r1, r2].filter(r => r !== ''));
+//   });
+// }
 
-    const r1 = applyParser(p1, input);
-    if (r1 === noResult) {
-      input.setPosition(pos);
-
-      return noResult;
-    }
-
-    const r2 = applyParser(p2, input);
-    if (r2 === noResult) {
-      input.setPosition(pos);
-
-      return noResult;
-    }
-    return success([r1, r2].filter(r => r !== ''));
-  });
-}
-
-export function or(...args: Array<IParser | string>) {
+export function or(...args: Array<IParser | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
@@ -172,7 +111,7 @@ export function or(...args: Array<IParser | string>) {
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
-export function seq(...args: Array<IParser2 | string>) {
+export function seq(...args: Array<IParser2 | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
@@ -200,8 +139,8 @@ export function seq(...args: Array<IParser2 | string>) {
 }
 
 // Doesn't advance position
-export function not(parser) {
-  parser = util.isString(parser) ? word(parser as string) as IParser : parser as IParser;
+export function not(parserIn: string | IParser): IParser {
+  const parser = (util.isString(parserIn) ? word(parserIn as string) : parserIn) as IParser;
 
   return mkParser((input: Input, success) => {
     const pos = input.getPosition();
@@ -216,12 +155,25 @@ export function not(parser) {
   });
 }
 
+export function many(parser: IParser): IParser {
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
+    let results: any[] = [];
+
+    let result = applyParser(parser, input);
+    while (result !== null) {
+      results.push(result);
+      result = applyParser(parser, input);
+    }
+    return success(results);
+  });
+}
+
 function test() {
 
-  parseAndPrint(and(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')}), 'bc');
+  parseAndPrint(seq(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')}), 'bc');
   parseAndPrint(word('charles').map(r => 'yay!'), 'charles');
   parseAndPrint(seq('ch', 'ar', 'les'), 'charles');
-  parseAndPrint(seq('ch', 'ar', 'les').map(r => r.join('')), 'charles');
+  parseAndPrint(seq('ch', 'ar', 'les').map((r: string[]) => r.join('')), 'charles');
   parseAndPrint(or('hi', 'bye'), 'bye');
   parseAndPrint(not('hi').map(r => r === ''), 'hi');
 
