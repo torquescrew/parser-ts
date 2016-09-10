@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/mocha": "^2.2.31",
+    "@types/node": "^6.0.38",
     "@types/parsimmon": "^0.5.28",
     "@types/underscore": "^1.7.32",
     "mocha": "^3.0.2",

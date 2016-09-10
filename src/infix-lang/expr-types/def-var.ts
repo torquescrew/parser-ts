@@ -1,7 +1,13 @@
 import {IInputData} from "../../input";
+import {Expr} from "./expr";
 
 
-export function handleFail(inputData: IInputData, extra) {
+interface DefVar extends Expr {
+  identifier: string;
+  value: Expr
+}
+
+export function defVarFail(inputData: IInputData, extra) {
   const pos = inputData.position;
 
   if (extra && extra['parserIndex'] > 1) {
@@ -9,7 +15,7 @@ export function handleFail(inputData: IInputData, extra) {
   }
 }
 
-export function handleSuccess(res) {
+export function mkDefVar(res): DefVar {
   const identifier = res[1];
   const value = res[3];
 

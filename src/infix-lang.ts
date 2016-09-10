@@ -4,7 +4,8 @@ import {
 } from './parser-lib/parsers-m';
 import {IInputData} from "./input";
 import * as path from 'path';
-import {handleFail, handleSuccess} from "./infix-lang/expr-types/def-var";
+import {defVarFail, mkDefVar} from "./infix-lang/expr-types/def-var";
+import {mkFunCall} from "./infix-lang/expr-types/fun-call";
 
 
 const _true = word('true');
@@ -21,7 +22,7 @@ const cBool = or(_true, _false);
 const primitive = or(number, stringLiteral, cBool);
 const identifier = and(not(reserved), ident).map(r => r[0]);
 
-const defVar = and(__, _let, __, identifier, __, _equals, __, expr, _semi, __).fail(handleFail).map(handleSuccess);
+const defVar = and(__, _let, __, identifier, __, _equals, __, expr, _semi, __).fail(defVarFail).map(mkDefVar);
 
 // const statement: IParser = and(__, expr, _semi, __);
 
@@ -35,13 +36,15 @@ const defFun = and(__, _fun, __, identifier, __, argumentBlock, __, block).fail(
   }
 });
 
-const funCall = and(__, identifier, and(__, '(', __, repSep(expr, ','), __, ')', __), _semi).fail((input, extra) => {
+const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __);
+
+const funCall = and(__, identifier, argumentCallBlock, _semi).fail((input, extra) => {
   if (extra && extra['parserIndex'] > 1) {
     console.log('funCall parse error: ', input, extra);
   }
-});
+}).map(mkFunCall);
 
-const infixFunCall = and(identifier, '..', identifier, and(__, '(', __, repSep(expr, ','), __, ')', __), _semi).fail((input, extra) => {
+const infixFunCall = and(identifier, '..', identifier, argumentCallBlock, _semi).fail((input, extra) => {
   // console.log()
 });
 
