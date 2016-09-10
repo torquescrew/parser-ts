@@ -149,7 +149,7 @@ export function many(parser: IParser2): IParser {
 }
 
 // Always succeeds
-export function repSep(parser: IParser, separator: string): IParser {
+export function repSep(parser: IParser2, separator: string): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
     let sepParser = and(__, word(separator), __);

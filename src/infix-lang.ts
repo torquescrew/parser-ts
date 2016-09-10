@@ -39,8 +39,18 @@ const defFun = and(__, _fun, __, identifier, __, argumentBlock, __, block).fail(
   }
 });
 
+const funCall = and(__, identifier, and(__, '(', __, repSep(expr, ','), __, ')', __), _semi).fail((input, extra) => {
+  if (extra && extra['parserIndex'] > 1) {
+    console.log('funCall parse error: ', input, extra);
+  }
+});
+
+const infixFunCall = and(identifier, '..', identifier, and(__, '(', __, repSep(expr, ','), __, ')', __), _semi).fail((input, extra) => {
+  // console.log()
+});
+
 function expr() {
-  return or(identifier, primitive, defVar, defFun);
+  return or(infixFunCall, identifier, primitive, defVar, defFun, funCall);
 }
 
 export function test() {
@@ -48,5 +58,7 @@ export function test() {
   // parseAndPrint(block, '{ let a = 5; let b = 6; }');
   // parseAndPrint(block, '{ 5; }');
   // parseAndPrint(defFun, 'fun square(n) { 5 }');
-  parseAndPrint(many(expr), 'let a =2; fun charles (a) { let a = 5; let b = 6; }');
+  // parseAndPrint(funCall, 'myFunc(1);');
+  // parseAndPrint(many(expr), 'a..times(2);');
+  parseAndPrint(many(expr), 'let a =2; a..times(2); fun myFunc (a) { let a = 5; let b = 6; a..times(2); } myFunc(5, 3);');
 }
