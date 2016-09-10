@@ -75,14 +75,15 @@ export function or(...args: Array<IParser | string>): IParser {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
 
-  return mkParser((input: Input, handleResult) => {
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     for (let i = 0; i < parsers.length; i++) {
       const result = applyParser(parsers[i], input);
 
       if (result !== noResult) {
-        return handleResult(result);
+        return success(result);
       }
     }
+    fail(input.getInputData());
     return noResult;
   });
 }
@@ -103,7 +104,7 @@ export function and(...args: Array<IParser2 | string>): IParser {
       let result = applyParser(parsers[i], input);
 
       if (result === noResult) {
-        fail(input.getInputData(), i);
+        fail(input.getInputData(), {parserIndex: i});
 
         input.setPosition(pos);
         return noResult;
@@ -134,7 +135,7 @@ export function not(parserIn: string | IParser): IParser {
   });
 }
 
-export function many(parser: IParser): IParser {
+export function many(parser: IParser2): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
 
@@ -143,6 +144,33 @@ export function many(parser: IParser): IParser {
       results.push(result);
       result = applyParser(parser, input);
     }
+    return success(results);
+  });
+}
+
+// Always succeeds
+export function repSep(parser: IParser, separator: string): IParser {
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
+    let results: any[] = [];
+    let sepParser = and(__, word(separator), __);
+
+    let result = applyParser(parser, input);
+    while (result !== noResult) {
+      results.push(result);
+
+      let sepRes = applyParser(sepParser, input);
+      if (sepRes !== noResult) {
+        result = applyParser(parser, input);
+      }
+      else {
+        result = noResult;
+      }
+    }
+    // if (results.length === 0) {
+    //   fail(input.getInputData());
+    //   return noResult;
+    // }
+
     return success(results);
   });
 }

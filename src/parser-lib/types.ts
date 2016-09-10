@@ -7,7 +7,7 @@ export const noResult: NoResult = null;
 export type ParserResult = any;
 
 export type SuccessFunc = (result: ParserResult) => any;
-export type FailFunc = (input: IInputData, ...extra: any[]) => any;
+export type FailFunc = (input: IInputData, extra?: Object) => any;
 
 export interface RawParser {
   apply: (input: Input) => any;
@@ -25,9 +25,9 @@ export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure
   let mapFunc: SuccessFunc;
   let failFunc: FailFunc;
 
-  let handleFail = (input, ...args) => {
+  let handleFail = (inputData: IInputData, extra?: Object) => {
     if (failFunc) {
-      return failFunc(input, args);
+      return failFunc(inputData, extra);
     }
     else {
       return noResult;
