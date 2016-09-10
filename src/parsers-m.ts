@@ -1,4 +1,4 @@
-import {Input} from './input';
+import {Input, IInputData} from './input';
 import * as util from './util';
 
 
@@ -13,16 +13,37 @@ export const stringLiteral: IParser = regex(/"([^"\\]|\\.)*"/);
 
 export const ident: IParser = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
 
+type ParserResult = any;
 
-type MapFunc = (any) => any;
 
-interface IParser {
-  apply: (Input) => any;
-  map: (Function) => IParser;
+type SuccessFunc = (result: ParserResult) => any;
+type FailFunc = (input: IInputData, ...extra: any[]) => any;
+
+interface RawParser {
+  apply: (input: Input) => any;
+  map: (success: SuccessFunc) => IParser;
+  fail: (fail: FailFunc) => IParser;
 }
 
-function mkParser(applyFunc: (Input, Function) => any): IParser {
-  let mapFunc: MapFunc;
+type WrappedParser = (() => RawParser);
+
+type IParser2 = RawParser | WrappedParser;
+
+type IParser = RawParser;
+
+
+function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure: FailFunc) => any): IParser {
+  let mapFunc: SuccessFunc;
+  let failFunc: FailFunc;
+
+  let handleFail = (input, ...args) => {
+    if (failFunc) {
+      return failFunc(input, args);
+    }
+    else {
+      return noResult;
+    }
+  };
 
   let handleResult = (result: any) => {
     if (mapFunc) {
@@ -35,13 +56,18 @@ function mkParser(applyFunc: (Input, Function) => any): IParser {
 
   let self: IParser = {
     apply: (input: Input) => {
-      return applyFunc(input, handleResult);
+      return applyFunc(input, handleResult, handleFail);
     },
-    map: (f: MapFunc) => {
+    map: (f: SuccessFunc) => {
       mapFunc = f;
 
       return self;
     },
+    fail: (f: FailFunc) => {
+      failFunc = f;
+
+      return self;
+    }
   };
 
   return self;
@@ -81,7 +107,7 @@ export function word(str: string): IParser {
 
 export function optionalWhiteSpace() {
   return mkParser((input: Input, handleResult) => {
-    while (input.nextChar() === '') {
+    while (input.nextChar() === ' ') {
       input.advance();
     }
 
@@ -90,14 +116,14 @@ export function optionalWhiteSpace() {
 }
 
 export function regex(re: RegExp) {
-  return mkParser((input: Input, handleResult: MapFunc) => {
+  return mkParser((input: Input, success: SuccessFunc) => {
     const code = input.rest();
     const match = re.exec(code);
 
     if (match !== null && match.index === 0) {
       const result = match[0];
       input.advanceBy(result.length);
-      return handleResult(result);
+      return success(result);
     }
     else {
       return noResult;
@@ -106,7 +132,7 @@ export function regex(re: RegExp) {
 }
 
 export function and(p1: IParser, p2: IParser) {
-  return mkParser((input: Input, handleResult) => {
+  return mkParser((input: Input, success, fail) => {
     const pos = input.getPosition();
 
     const r1 = applyParser(p1, input);
@@ -122,7 +148,7 @@ export function and(p1: IParser, p2: IParser) {
 
       return noResult;
     }
-    return handleResult([r1, r2].filter(r => r !== ''));
+    return success([r1, r2].filter(r => r !== ''));
   });
 }
 
@@ -146,12 +172,12 @@ export function or(...args: Array<IParser | string>) {
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
-export function seq(...args: Array<IParser | string>) {
+export function seq(...args: Array<IParser2 | string>) {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
 
-  return mkParser((input: Input, handleResult) => {
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     const pos = input.getPosition();
     let results: any[] = [];
 
@@ -159,6 +185,8 @@ export function seq(...args: Array<IParser | string>) {
       let result = applyParser(parsers[i], input);
 
       if (result === noResult) {
+        fail(input.getInputData(), i);
+
         input.setPosition(pos);
         return noResult;
       }
@@ -166,7 +194,25 @@ export function seq(...args: Array<IParser | string>) {
         results.push(result);
       }
     }
-    return handleResult(results);
+    // console.log('seq succeeded');
+    return success(results);
+  });
+}
+
+// Doesn't advance position
+export function not(parser) {
+  parser = util.isString(parser) ? word(parser as string) as IParser : parser as IParser;
+
+  return mkParser((input: Input, success) => {
+    const pos = input.getPosition();
+    const result = applyParser(parser, input);
+
+    if (result !== noResult) {
+      input.setPosition(pos);
+
+      return noResult;
+    }
+    return success('');
   });
 }
 
@@ -176,16 +222,30 @@ function test() {
   parseAndPrint(word('charles').map(r => 'yay!'), 'charles');
   parseAndPrint(seq('ch', 'ar', 'les'), 'charles');
   parseAndPrint(seq('ch', 'ar', 'les').map(r => r.join('')), 'charles');
+  parseAndPrint(or('hi', 'bye'), 'bye');
+  parseAndPrint(not('hi').map(r => r === ''), 'hi');
 
 }
-test();
+// test();
 
 export function parseAndPrint(parser: IParser, text: string) {
   let input = new Input(text);
   let result = applyParser(parser, input);
-  console.log(result);
+  if (result === null) {
+    console.log('Compile failed.');
+  }
+  else {
+    console.log(result);
+  }
 }
 
-export function applyParser(parser: IParser, input: Input) {
-  return parser.apply(input);
+export function applyParser(parser: IParser2, input: Input) {
+  if (parser['length'] === 0) {
+    const wrappedParser = parser as WrappedParser;
+    return wrappedParser().apply(input);
+  }
+  else {
+    const rawParser = parser as RawParser;
+    return rawParser.apply(input);
+  }
 }

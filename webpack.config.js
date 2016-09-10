@@ -1,7 +1,10 @@
 module.exports = {
-  entry: './src/main.ts',
+  entry: {
+    bundle: './src/main.ts'
+    // test: './test/test.ts'
+  },
   output: {
-    filename: './dist/bundle.js'
+    filename: './dist/[name].js'
   },
   resolve: {
     // Add `.ts` and `.tsx` as a resolvable extension.
@@ -13,4 +16,4 @@ module.exports = {
       { test: /\.tsx?$/, loader: 'ts-loader' }
     ]
   }
-}
+};

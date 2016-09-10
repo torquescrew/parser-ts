@@ -18,13 +18,15 @@ var _def = word('def');
 var _equals = char('=');
 var _semi = char(';');
 
+var reserved = or(_true, _false, _val, _var, _def, _equals, _semi);
+
 var keyword = or(_var);
 
 var cBool = or(_true, _false);
 
 var primitive = or(number, stringLiteral, cBool);
 
-var identifier = and(not(keyword), ident);
+var identifier = and(not(reserved), ident);
 
 /*
 possible results:
@@ -47,7 +49,7 @@ var operation = seq(expr, __, operator, __, expr);
 
 
 export function test() {
-  // parseAndPrint(block, '{ var a = 5; var b = 6; }');
+  parseAndPrint(block, '{ var a = 5; var b = 6; }');
   parseAndPrint(defVar, 'var a = 5');
 // parseAndPrint(defFunc, 'def sqr (x) = { }');
 }
