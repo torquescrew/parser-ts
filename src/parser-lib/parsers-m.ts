@@ -70,27 +70,6 @@ export function regex(re: RegExp): IParser {
   });
 }
 
-// export function and(p1: IParser, p2: IParser): IParser {
-//   return mkParser((input: Input, success, fail) => {
-//     const pos = input.getPosition();
-//
-//     const r1 = applyParser(p1, input);
-//     if (r1 === noResult) {
-//       input.setPosition(pos);
-//
-//       return noResult;
-//     }
-//
-//     const r2 = applyParser(p2, input);
-//     if (r2 === noResult) {
-//       input.setPosition(pos);
-//
-//       return noResult;
-//     }
-//     return success([r1, r2].filter(r => r !== ''));
-//   });
-// }
-
 export function or(...args: Array<IParser | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
@@ -111,7 +90,7 @@ export function or(...args: Array<IParser | string>): IParser {
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
-export function seq(...args: Array<IParser2 | string>): IParser {
+export function and(...args: Array<IParser2 | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
@@ -133,7 +112,7 @@ export function seq(...args: Array<IParser2 | string>): IParser {
         results.push(result);
       }
     }
-    // console.log('seq succeeded');
+    // console.log('and succeeded');
     return success(results);
   });
 }
@@ -170,10 +149,10 @@ export function many(parser: IParser): IParser {
 
 function test() {
 
-  parseAndPrint(seq(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')}), 'bc');
+  parseAndPrint(and(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')}), 'bc');
   parseAndPrint(word('charles').map(r => 'yay!'), 'charles');
-  parseAndPrint(seq('ch', 'ar', 'les'), 'charles');
-  parseAndPrint(seq('ch', 'ar', 'les').map((r: string[]) => r.join('')), 'charles');
+  parseAndPrint(and('ch', 'ar', 'les'), 'charles');
+  parseAndPrint(and('ch', 'ar', 'les').map((r: string[]) => r.join('')), 'charles');
   parseAndPrint(or('hi', 'bye'), 'bye');
   parseAndPrint(not('hi').map(r => r === ''), 'hi');
 

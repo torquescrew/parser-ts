@@ -1,5 +1,5 @@
 import {
-  char, word, or, seq, ident, not, __, many, parseAndPrint, stringLiteral,
+  char, word, or, and, ident, not, __, many, parseAndPrint, stringLiteral,
   number
 } from './parser-lib/parsers-m';
 import {IInputData} from "./input";
@@ -18,9 +18,9 @@ const reserved = or(_true, _false, _let, _fun, _equals, _semi);
 const cBool = or(_true, _false);
 
 const primitive = or(number, stringLiteral, cBool);
-const identifier = seq(not(reserved), ident);
+const identifier = and(not(reserved), ident);
 
-const defVar = seq(_let, __, identifier, __, _equals, __, expr).fail((inputData: IInputData, args) => {
+const defVar = and(_let, __, identifier, __, _equals, __, expr).fail((inputData: IInputData, args) => {
   const parserIndex = args[0];
   const pos = inputData.position;
 
@@ -29,9 +29,9 @@ const defVar = seq(_let, __, identifier, __, _equals, __, expr).fail((inputData:
   }
 });
 
-const statement: IParser = seq(__, expr, _semi, __);
+const statement: IParser = and(__, expr, _semi, __);
 
-const block = seq('{', __, many(statement), __, '}');
+const block = and('{', __, many(statement), __, '}');
 
 function expr() {
   return or(identifier, defVar, primitive);
