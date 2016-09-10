@@ -3,6 +3,7 @@ module.exports = {
     bundle: './src/main.ts'
     // test: './test/test.ts'
   },
+  target: 'node',
   output: {
     filename: './dist/[name].js'
   },

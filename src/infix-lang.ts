@@ -1,8 +1,10 @@
 import {
   char, word, or, and, ident, not, __, many, parseAndPrint, stringLiteral,
-  number, repSep
+  number, repSep, parseAndPrintFile
 } from './parser-lib/parsers-m';
 import {IInputData} from "./input";
+import * as path from 'path';
+import {handleFail, handleSuccess} from "./infix-lang/expr-types/def-var";
 
 
 const _true = word('true');
@@ -17,15 +19,9 @@ const reserved = or(_true, _false, _let, _fun, _equals, _semi);
 const cBool = or(_true, _false);
 
 const primitive = or(number, stringLiteral, cBool);
-const identifier = and(not(reserved), ident);
+const identifier = and(not(reserved), ident).map(r => r[0]);
 
-const defVar = and(__, _let, __, identifier, __, _equals, __, expr, _semi, __).fail((inputData: IInputData, extra) => {
-  const pos = inputData.position;
-
-  if (extra && extra['parserIndex'] > 1) {
-    console.log('Error: Expected identifier, found:', inputData.code.slice(pos, pos + 20));
-  }
-});
+const defVar = and(__, _let, __, identifier, __, _equals, __, expr, _semi, __).fail(handleFail).map(handleSuccess);
 
 // const statement: IParser = and(__, expr, _semi, __);
 
@@ -60,5 +56,7 @@ export function test() {
   // parseAndPrint(defFun, 'fun square(n) { 5 }');
   // parseAndPrint(funCall, 'myFunc(1);');
   // parseAndPrint(many(expr), 'a..times(2);');
-  parseAndPrint(many(expr), 'let a =2; a..times(2); fun myFunc (a) { let a = 5; let b = 6; a..times(2); } myFunc(5, 3);');
+  // parseAndPrint(many(expr), 'let a =2; a..times(2); fun myFunc (a) { let a = 5; let b = 6; a..times(2); } myFunc(5, 3);');
+
+  parseAndPrintFile(many(expr), path.join(process.cwd(), 'example-code', 'e1.fs'));
 }

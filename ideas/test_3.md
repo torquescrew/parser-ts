@@ -30,7 +30,7 @@ def main =
 def incrementTime(gs: GameState): GameState =
   gs.time += 1
 
-// mutation
+# mutation
 def incrementTime2(gs: GameState): GameState =
   set gs.time += 1
   gs

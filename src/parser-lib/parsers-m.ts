@@ -1,4 +1,4 @@
-import {Input} from "../input";
+import {Input, makeInputFromFile} from "../input";
 import * as util from "../util";
 import {noResult, SuccessFunc, FailFunc, RawParser, WrappedParser, IParser, IParser2, mkParser} from "./types";
 
@@ -196,6 +196,21 @@ export function parseAndPrint(parser: IParser, text: string) {
   else {
     console.log(result);
   }
+}
+
+export function parseAndPrintFile(parser: IParser, fileName: string) {
+  const input = makeInputFromFile(fileName);
+  if (input !== null) {
+    const result = applyParser(parser, input);
+
+    if (result === null) {
+      console.log('Compile failed.');
+    }
+    else {
+      console.log(result);
+    }
+  }
+
 }
 
 export function applyParser(parser: IParser2, input: Input) {
