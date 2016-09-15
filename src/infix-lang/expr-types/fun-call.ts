@@ -7,14 +7,24 @@ export interface FunCall extends Expr {
 }
 
 export function mkFunCall(res): FunCall {
-  console.log(res);
+  const name = res[0];
+  const args = res[1];
 
-  return res;
+  return {
+    type: 'funCall',
+    functionName: name,
+    arguments: args
+  };
 }
 
 
 export function mkFunCallInfix(res): FunCall {
-  console.log(res);
+  const name = res[2];
+  const args = [res[0]].concat(res[3]);
 
-  return res;
+  return {
+    type: 'funCall',
+    functionName: name,
+    arguments: args
+  };
 }

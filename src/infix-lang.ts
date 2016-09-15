@@ -5,7 +5,7 @@ import {
 import {IInputData} from "./input";
 import * as path from 'path';
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/def-var";
-import {mkFunCall} from "./infix-lang/expr-types/fun-call";
+import {mkFunCall, mkFunCallInfix} from "./infix-lang/expr-types/fun-call";
 
 
 const _true = word('true');
@@ -36,7 +36,9 @@ const defFun = and(__, _fun, __, identifier, __, argumentBlock, __, block).fail(
   }
 });
 
-const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __);
+const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __).map(res => {
+  return res[1];
+});
 
 const funCall = and(__, identifier, argumentCallBlock, _semi).fail((input, extra) => {
   if (extra && extra['parserIndex'] > 1) {
@@ -44,9 +46,7 @@ const funCall = and(__, identifier, argumentCallBlock, _semi).fail((input, extra
   }
 }).map(mkFunCall);
 
-const infixFunCall = and(identifier, '..', identifier, argumentCallBlock, _semi).fail((input, extra) => {
-  // console.log()
-});
+const infixFunCall = and(identifier, '..', identifier, argumentCallBlock, _semi).map(mkFunCallInfix);
 
 function expr() {
   return or(infixFunCall, identifier, primitive, defVar, defFun, funCall);
