@@ -15,6 +15,7 @@
     "@types/node": "^6.0.38",
     "@types/parsimmon": "^0.5.28",
     "@types/underscore": "^1.7.32",
+    "js-beautify": "^1.6.4",
     "mocha": "^3.0.2",
     "parsimmon": "^0.9.2",
     "ts-loader": "^0.8.2",

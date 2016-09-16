@@ -210,7 +210,21 @@ export function parseAndPrintFile(parser: IParser, fileName: string) {
       console.log(result);
     }
   }
+}
 
+export function parseFile(parser: IParser, fileName: string): string {
+  const input = makeInputFromFile(fileName);
+  if (input !== null) {
+    const result = applyParser(parser, input);
+
+    if (result === null) {
+      return 'Compile failed.';
+    }
+    else {
+      return result;
+    }
+  }
+  return 'failed to read file';
 }
 
 export function applyParser(parser: IParser2, input: Input) {

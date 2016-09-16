@@ -2,7 +2,7 @@ import {IInputData} from "../../input";
 import {Expr} from "./expr";
 
 
-interface DefVar extends Expr {
+export interface DefVar extends Expr {
   identifier: string;
   value: Expr
 }
