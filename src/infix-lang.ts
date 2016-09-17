@@ -8,6 +8,7 @@ import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition"
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
 import {toJs, mkBool, mkNumber, mkString, mkIdentifier} from "./infix-lang/expr-types/expr";
 import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function-definition";
+import {mkConditional} from "./infix-lang/expr-types/conditionals";
 
 const beautify = require('js-beautify')['js_beautify'];
 
@@ -18,8 +19,12 @@ const fLet = word('let');
 const fFun = word('fun');
 const fEquals = char('=');
 
+const fIf = word('if');
+const fElseIf = word('else if');
+const fElse = word('else');
 
-const reserved = or(fTrue, fFalse, fLet, fFun, fEquals);
+
+const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fIf, fElseIf, fElse);
 
 const fBool = or(fTrue, fFalse).map(mkBool);
 const fNumber = number.map(mkNumber);
@@ -54,8 +59,16 @@ const funCall = and(__, identifier, argumentCallBlock)
 const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
   .map(mkFunCallInfix);
 
+const elseIfConditional = and(__, fElseIf, __, expr, __, block, __);
+
+const elseConditional = and(__, fElse, __, block, __);
+
+const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
+  .map(mkConditional);
+
+
 export function expr() {
-  return or(infixFunCall, identifier, primitive, defVar, defFun, funCall);
+  return or(infixFunCall, identifier, primitive, defVar, defFun, funCall, ifConditional);
 }
 
 export function test() {

@@ -27,5 +27,15 @@ function checkExprParse(type: string, code: string): void {
   });
 }
 
+describe('conditionals', function() {
+  checkExprParse(ETypes.Conditional, 'if a { let b = a }');
+  checkExprParse(ETypes.Conditional, 'if a { let a = 5 } else if b { let b = c } else { let a = 3 }');
+
+  // it('parses', function() {
+  //   const result = parse(expr, 'if a { let a = 5 } else if b { } else { let a = 3 }');
+  //   console.log(result);
+  // });
+});
+
 
 

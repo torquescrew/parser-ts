@@ -10,7 +10,8 @@ export const ETypes = {
   Boolean: 'Boolean',
   Number: 'Number',
   String: 'String',
-  Identifier: 'Identifier'
+  Identifier: 'Identifier',
+  Conditional: 'Conditional'
 };
 
 export interface Expr {
@@ -52,6 +53,7 @@ export function toJs(expr: any) {
   }
 }
 
+// TODO
 export function traverseTree(expr: any, f: (expr: Expr) => any) {
   // if (expr.isArray()) {
   //
