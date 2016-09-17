@@ -1,4 +1,5 @@
 import {Expr, ETypes, FIdentifier} from "./expr";
+import {IInputData} from "../../input";
 
 
 export interface FunCall extends Expr {
@@ -6,7 +7,7 @@ export interface FunCall extends Expr {
   arguments: Expr[];
 }
 
-export function mkFunCall(res): FunCall {
+export function mkFunctionCall(res): FunCall {
   const name = res[0] as FIdentifier;
   const args = res[1];
 
@@ -17,6 +18,11 @@ export function mkFunCall(res): FunCall {
   };
 }
 
+export function functionCallFail(input: IInputData, extra) {
+  if (extra && extra['parserIndex'] > 1) {
+    console.log('funCall parse error: ', input, extra);
+  }
+}
 
 export function mkFunCallInfix(res): FunCall {
   const fIdentifier = res[2] as FIdentifier;

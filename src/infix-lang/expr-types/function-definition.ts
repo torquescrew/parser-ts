@@ -1,4 +1,5 @@
 import {Expr, ETypes} from "./expr";
+import {IInputData} from "../../input";
 
 
 export interface DefFun extends Expr {
@@ -14,5 +15,11 @@ export function mkDefFun(res): DefFun {
     arguments: res[2],
     block: res[3]
   };
+}
+
+export function functionDefinitionFail(input: IInputData, extra) {
+  if (extra && extra['parserIndex'] > 1) {
+    console.log('defFun parse error: ', input, extra);
+  }
 }
 
