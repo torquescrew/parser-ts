@@ -22,7 +22,6 @@ export type IParser2 = RawParser | WrappedParser;
 export type IParser = RawParser;
 
 export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure: FailFunc) => any): IParser {
-  // let mapFunc: SuccessFunc;
   let successFuncs: SuccessFunc[] = [];
   let failFunc: FailFunc;
 
@@ -36,18 +35,9 @@ export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure
   };
 
   let handleSuccess = (result: any) => {
-    // if (successFuncs.length > 0) {
-    //   return applySuccessFuncs(successFuncs, result);
     return successFuncs.reduce((partialResult, f) => {
       return f(partialResult);
     }, result);
-    // }
-    // if (mapFunc) {
-    //   return mapFunc(result);
-    // }
-    // else {
-    //   return result;
-    // }
   };
 
   let self: IParser = {
@@ -56,7 +46,6 @@ export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure
     },
     map: (f: SuccessFunc) => {
       successFuncs.push(f);
-      // mapFunc = f;
 
       return self;
     },
@@ -69,9 +58,3 @@ export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure
 
   return self;
 }
-
-// function applySuccessFuncs(successFuncs: SuccessFunc[], result: ParserResult) {
-//   return successFuncs.reduce((currentResult, f) => {
-//     return f(currentResult);
-//   }, result);
-// }

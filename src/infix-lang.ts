@@ -6,7 +6,7 @@ import {IInputData} from "./input";
 import * as path from 'path';
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/def-var";
 import {mkFunCall, mkFunCallInfix} from "./infix-lang/expr-types/fun-call";
-import {toJs} from "./infix-lang/expr-types/expr";
+import {toJs, mkBool} from "./infix-lang/expr-types/expr";
 import {mkDefFun} from "./infix-lang/expr-types/def-fun";
 // import * as beautify from 'js-beautify';
 const beautify = require('js-beautify')['js_beautify'];
@@ -17,16 +17,16 @@ const _false = word('false');
 const _let = word('let');
 const _fun = word('fun');
 const _equals = char('=');
-const _semi = char(';');
 
-const reserved = or(_true, _false, _let, _fun, _equals, _semi);
 
-const cBool = or(_true, _false);
+const reserved = or(_true, _false, _let, _fun, _equals);
+
+const cBool = or(_true, _false).map(mkBool);
 
 const primitive = or(number, stringLiteral, cBool);
 const identifier = and(not(reserved), ident).map(r => r[0]);
 
-const defVar = and(__, _let, __, identifier, __, _equals, __, expr, _semi, __).fail(defVarFail).map(mkDefVar).map(toJs);
+const defVar = and(__, _let, __, identifier, __, _equals, __, expr, __).fail(defVarFail).map(mkDefVar);
 
 // const statement: IParser = and(__, expr, _semi, __);
 
@@ -42,15 +42,15 @@ const defFun = and(__, _fun, __, identifier, __, argumentBlock, __, block).fail(
 
 const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __).map(res => res[1]);
 
-const funCall = and(__, identifier, argumentCallBlock, _semi).fail((input, extra) => {
+const funCall = and(__, identifier, argumentCallBlock).fail((input, extra) => {
   if (extra && extra['parserIndex'] > 1) {
     console.log('funCall parse error: ', input, extra);
   }
 }).map(mkFunCall).map(toJs);
 
-const infixFunCall = and(identifier, '..', identifier, argumentCallBlock, _semi).map(mkFunCallInfix).map(toJs);
+const infixFunCall = and(identifier, '..', identifier, argumentCallBlock).map(mkFunCallInfix).map(toJs);
 
-function expr() {
+export function expr() {
   return or(infixFunCall, identifier, primitive, defVar, defFun, funCall);
 }
 
@@ -63,7 +63,7 @@ export function test() {
   // parseAndPrint(many(expr), 'a..times(2);');
   // parseAndPrint(many(expr), 'let a =2; a..times(2); fun myFunc (a) { let a = 5; let b = 6; a..times(2); } myFunc(5, 3);');
 
-  const result = parseFile(many(expr).map((res: any) => res.join('\n')), path.join(process.cwd(), 'example-code', 'e1.fs'));
+  const result = parseFile(many(expr).map(toJs), path.join(process.cwd(), 'example-code', 'e1.fs'));
 
 
   // beautify(result);

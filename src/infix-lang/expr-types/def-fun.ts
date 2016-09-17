@@ -1,4 +1,4 @@
-import {Expr} from "./expr";
+import {Expr, ETypes} from "./expr";
 
 
 export interface DefFun extends Expr {
@@ -9,7 +9,7 @@ export interface DefFun extends Expr {
 
 export function mkDefFun(res): DefFun {
   return {
-    type: 'def-fun',
+    type: ETypes.FunctionDefinition,
     identifier: res[1],
     arguments: res[2],
     block: res[3]

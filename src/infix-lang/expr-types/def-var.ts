@@ -1,5 +1,5 @@
 import {IInputData} from "../../input";
-import {Expr} from "./expr";
+import {Expr, ETypes} from "./expr";
 
 
 export interface DefVar extends Expr {
@@ -20,7 +20,7 @@ export function mkDefVar(res): DefVar {
   const value = res[3];
 
   return {
-    type: 'def-var',
+    type: ETypes.VariableDefinition,
     identifier: identifier,
     value: value
   };

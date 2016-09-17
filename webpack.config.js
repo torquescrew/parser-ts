@@ -1,7 +1,7 @@
 module.exports = {
   entry: {
-    bundle: './src/main.ts'
-    // test: './test/test.ts'
+    bundle: './src/main.ts',
+    test: './test/test.ts'
   },
   target: 'node',
   output: {

@@ -1,4 +1,4 @@
-import {Expr} from "./expr";
+import {Expr, ETypes} from "./expr";
 
 
 export interface FunCall extends Expr {
@@ -11,7 +11,7 @@ export function mkFunCall(res): FunCall {
   const args = res[1];
 
   return {
-    type: 'funCall',
+    type: ETypes.FunctionCall,
     functionName: name,
     arguments: args
   };
@@ -23,7 +23,7 @@ export function mkFunCallInfix(res): FunCall {
   const args = [res[0]].concat(res[3]);
 
   return {
-    type: 'funCall',
+    type: ETypes.FunctionCall,
     functionName: name,
     arguments: args
   };

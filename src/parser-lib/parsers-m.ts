@@ -198,6 +198,18 @@ export function parseAndPrint(parser: IParser, text: string) {
   }
 }
 
+export function parse(parser: IParser2, code: string) {
+  const input = new Input(code);
+  const result = applyParser(parser, input);
+
+  if (result === null) {
+    return 'Compile failed.';
+  }
+  else {
+    return result;
+  }
+}
+
 export function parseAndPrintFile(parser: IParser, fileName: string) {
   const input = makeInputFromFile(fileName);
   if (input !== null) {

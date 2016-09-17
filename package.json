@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/bundle.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha ./dist/test.js",
     "watch": "webpack --watch",
     "start": "node ./dist/bundle.js"
   },
