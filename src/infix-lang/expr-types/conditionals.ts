@@ -1,4 +1,4 @@
-import {Expr, ETypes} from "./expr";
+import {Expr, ETypes, toJs} from "./expr";
 
 
 export interface FConditional extends Expr {
@@ -37,5 +37,29 @@ function mkElseConditional(res): ElseIfConditional[] {
 
 function mkElseBlock(res): Expr[] {
   return res.map(c => c[1])[0];
+}
+
+export function conditionalToJs(conditional: FConditional) {
+  console.log(conditional);
+
+  let result: string[] = [];
+
+  result.push(
+    `if (${toJs(conditional.ifCondition)}) { ${conditional.ifBlock.map(toJs).join('')} }`
+  );
+
+  conditional.elseIfConditions.forEach((c) => {
+    result.push(
+      `else if (${toJs(c.elseIfCondition)}) { ${c.elseIfBlock.map(toJs).join('')} }`
+    );
+  });
+
+  if (conditional.elseBlock.length > 0) {
+    result.push(
+      `else { ${conditional.elseBlock.map(toJs)} }`
+    )
+  }
+
+  return result.join('\n');
 }
 

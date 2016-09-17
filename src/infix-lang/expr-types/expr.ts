@@ -1,6 +1,7 @@
 import {DefVar} from "./variable-definition";
 import {FunCall} from "./function-call";
 import {DefFun} from "./function-definition";
+import {FConditional, conditionalToJs} from "./conditionals";
 
 
 export const ETypes = {
@@ -47,13 +48,10 @@ export function toJs(expr: any) {
     case ETypes.Identifier:
       const fIdent = expr as FIdentifier;
       return fIdent.value.toString();
-
     case ETypes.Conditional:
-      
+      return conditionalToJs(expr as FConditional);
     default:
       return `toJs for ${expr} not implemented`;
-      // console.log('no type: ', expr);
-      // return expr.toString();
   }
 }
 
