@@ -9,4 +9,14 @@ fun myFunc (a, c) {
   a..times(2)
 }
 
+if true {
+  let c = 5
+}
+else if false {
+
+}
+else {
+  let c = 9
+}
+
 myFunc(5, 3)

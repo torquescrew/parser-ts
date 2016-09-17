@@ -47,9 +47,13 @@ export function toJs(expr: any) {
     case ETypes.Identifier:
       const fIdent = expr as FIdentifier;
       return fIdent.value.toString();
+
+    case ETypes.Conditional:
+      
     default:
-      console.log('no type: ', expr);
-      return expr.toString();
+      return `toJs for ${expr} not implemented`;
+      // console.log('no type: ', expr);
+      // return expr.toString();
   }
 }
 
