@@ -1,13 +1,13 @@
-import {Expr, ETypes} from "./expr";
+import {Expr, ETypes, FIdentifier} from "./expr";
 
 
 export interface FunCall extends Expr {
-  functionName: string;
+  functionName: FIdentifier;
   arguments: Expr[];
 }
 
 export function mkFunCall(res): FunCall {
-  const name = res[0];
+  const name = res[0] as FIdentifier;
   const args = res[1];
 
   return {
@@ -19,12 +19,12 @@ export function mkFunCall(res): FunCall {
 
 
 export function mkFunCallInfix(res): FunCall {
-  const name = res[2];
+  const fIdentifier = res[2] as FIdentifier;
   const args = [res[0]].concat(res[3]);
 
   return {
     type: ETypes.FunctionCall,
-    functionName: name,
+    functionName: fIdentifier,
     arguments: args
   };
 }

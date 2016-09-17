@@ -1,6 +1,6 @@
 import {DefVar} from "./def-var";
 import {FunCall} from "./fun-call";
-import {DefFun} from "./def-fun";
+import {DefFun} from "./function-definition";
 
 
 export const ETypes = {
@@ -9,28 +9,45 @@ export const ETypes = {
   FunctionCall: 'FunctionCall',
   Boolean: 'Boolean',
   Number: 'Number',
-  String: 'String'
+  String: 'String',
+  Identifier: 'Identifier'
 };
 
 export interface Expr {
   type: string;
 }
 
-export function toJs(expr: Expr) {
+export function toJs(expr: any) {
+  if (expr instanceof Array) {
+    return expr.map(toJs).join('\n');
+  }
+
   switch (expr.type) {
     case ETypes.VariableDefinition:
       const defVar = expr as DefVar;
-      return `var ${defVar.identifier} = ${toJs(defVar.value)}`;
+      return `var ${toJs(defVar.identifier)} = ${toJs(defVar.value)}\n`;
     case ETypes.FunctionCall:
       const funCall = expr as FunCall;
-      return `${funCall.functionName}(${funCall.arguments.map(toJs).join(', ')})`;
+      return `${toJs(funCall.functionName)}(${funCall.arguments.map(toJs).join(', ')})`;
     case ETypes.FunctionDefinition:
       const defFun = expr as DefFun;
-      const args = defFun.arguments.join(', ');
+      const args = defFun.arguments.map(toJs).join(', ');
       const block = defFun.block.map(toJs).join('\n');
-      return `function ${defFun.identifier} (${args}) {\n ${block} \n }`;
+      return `function ${toJs(defFun.identifier)} (${args}) {\n ${block} \n }`;
+    case ETypes.Boolean:
+      const bool = expr as FBool;
+      return bool.value.toString();
+    case ETypes.Number:
+      const fNum = expr as FNumber;
+      return fNum.value.toString();
+    case ETypes.String:
+      const fString = expr as FString;
+      return fString.value.toString();
+    case ETypes.Identifier:
+      const fIdent = expr as FIdentifier;
+      return fIdent.value.toString();
     default:
-      console.log(expr);
+      console.log('no type: ', expr);
       return expr.toString();
   }
 }
@@ -82,4 +99,15 @@ export function mkString(res): FString {
     type: ETypes.String,
     value: res
   };
+}
+
+export interface FIdentifier extends Expr {
+  value: string;
+}
+
+export function mkIdentifier(res): FIdentifier {
+  return {
+    type: ETypes.Identifier,
+    value: res[0]
+  }
 }

@@ -6,9 +6,9 @@ import {IInputData} from "./input";
 import * as path from 'path';
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/def-var";
 import {mkFunCall, mkFunCallInfix} from "./infix-lang/expr-types/fun-call";
-import {toJs, mkBool, mkNumber, mkString} from "./infix-lang/expr-types/expr";
-import {mkDefFun} from "./infix-lang/expr-types/def-fun";
-// import * as beautify from 'js-beautify';
+import {toJs, mkBool, mkNumber, mkString, mkIdentifier} from "./infix-lang/expr-types/expr";
+import {mkDefFun} from "./infix-lang/expr-types/function-definition";
+
 const beautify = require('js-beautify')['js_beautify'];
 
 
@@ -27,11 +27,9 @@ const fString = stringLiteral.map(mkString);
 
 const primitive = or(fNumber, fString, fBool);
 
-const identifier = and(not(reserved), ident).map(r => r[0]);
+const identifier = and(not(reserved), ident).map(mkIdentifier);
 
 const defVar = and(__, _let, __, identifier, __, _equals, __, expr, __).fail(defVarFail).map(mkDefVar);
-
-// const statement: IParser = and(__, expr, _semi, __);
 
 const block = and('{', __, many(expr), __, '}').map(res => res[1]);
 
@@ -41,7 +39,7 @@ const defFun = and(__, _fun, __, identifier, __, argumentBlock, __, block).fail(
   if (extra && extra['parserIndex'] > 1) {
     console.log('defFun parse error: ', inputData, extra);
   }
-}).map(mkDefFun).map(toJs);
+}).map(mkDefFun);
 
 const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __).map(res => res[1]);
 
@@ -49,9 +47,9 @@ const funCall = and(__, identifier, argumentCallBlock).fail((input, extra) => {
   if (extra && extra['parserIndex'] > 1) {
     console.log('funCall parse error: ', input, extra);
   }
-}).map(mkFunCall).map(toJs);
+}).map(mkFunCall);
 
-const infixFunCall = and(identifier, '..', identifier, argumentCallBlock).map(mkFunCallInfix).map(toJs);
+const infixFunCall = and(identifier, '..', identifier, argumentCallBlock).map(mkFunCallInfix);
 
 export function expr() {
   return or(infixFunCall, identifier, primitive, defVar, defFun, funCall);

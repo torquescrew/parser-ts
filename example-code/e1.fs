@@ -3,7 +3,7 @@ let  a =2
 
 a..times(2)
 
-fun myFunc (a) {
+fun myFunc (a, c) {
   let a = 5
   let b = 6
   a..times(2)
