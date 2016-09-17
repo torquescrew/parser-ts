@@ -6,7 +6,7 @@ import {IInputData} from "./input";
 import * as path from 'path';
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/def-var";
 import {mkFunCall, mkFunCallInfix} from "./infix-lang/expr-types/fun-call";
-import {toJs, mkBool} from "./infix-lang/expr-types/expr";
+import {toJs, mkBool, mkNumber, mkString} from "./infix-lang/expr-types/expr";
 import {mkDefFun} from "./infix-lang/expr-types/def-fun";
 // import * as beautify from 'js-beautify';
 const beautify = require('js-beautify')['js_beautify'];
@@ -21,9 +21,12 @@ const _equals = char('=');
 
 const reserved = or(_true, _false, _let, _fun, _equals);
 
-const cBool = or(_true, _false).map(mkBool);
+const fBool = or(_true, _false).map(mkBool);
+const fNumber = number.map(mkNumber);
+const fString = stringLiteral.map(mkString);
 
-const primitive = or(number, stringLiteral, cBool);
+const primitive = or(fNumber, fString, fBool);
+
 const identifier = and(not(reserved), ident).map(r => r[0]);
 
 const defVar = and(__, _let, __, identifier, __, _equals, __, expr, __).fail(defVarFail).map(mkDefVar);

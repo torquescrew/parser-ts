@@ -7,7 +7,9 @@ export const ETypes = {
   VariableDefinition: 'VariableDefinition',
   FunctionDefinition: 'FunctionDefinition',
   FunctionCall: 'FunctionCall',
-  Boolean: 'Boolean'
+  Boolean: 'Boolean',
+  Number: 'Number',
+  String: 'String'
 };
 
 export interface Expr {
@@ -49,13 +51,35 @@ export function traverseTree(expr: any, f: (expr: Expr) => any) {
 //   return e.type && ETypes[e.type] === e.type;
 // }
 
-export interface Bool extends Expr {
+export interface FBool extends Expr {
   value: boolean;
 }
 
-export function mkBool(res): Bool {
+export function mkBool(res): FBool {
   return {
     type: ETypes.Boolean,
     value: res === 'true'
+  };
+}
+
+export interface FNumber extends Expr {
+  value: number;
+}
+
+export function mkNumber(res): FNumber {
+  return {
+    type: ETypes.Number,
+    value: +res
+  };
+}
+
+export interface FString extends Expr {
+  value: string;
+}
+
+export function mkString(res): FString {
+  return {
+    type: ETypes.String,
+    value: res
   };
 }
