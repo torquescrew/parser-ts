@@ -4,8 +4,8 @@ import {
 } from './parser-lib/parsers-m';
 import {IInputData} from "./input";
 import * as path from 'path';
-import {defVarFail, mkDefVar} from "./infix-lang/expr-types/def-var";
-import {mkFunCall, mkFunCallInfix} from "./infix-lang/expr-types/fun-call";
+import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
+import {mkFunCall, mkFunCallInfix} from "./infix-lang/expr-types/function-call";
 import {toJs, mkBool, mkNumber, mkString, mkIdentifier} from "./infix-lang/expr-types/expr";
 import {mkDefFun} from "./infix-lang/expr-types/function-definition";
 

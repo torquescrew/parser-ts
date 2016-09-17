@@ -1,5 +1,5 @@
-import {DefVar} from "./def-var";
-import {FunCall} from "./fun-call";
+import {DefVar} from "./variable-definition";
+import {FunCall} from "./function-call";
 import {DefFun} from "./function-definition";
 
 
