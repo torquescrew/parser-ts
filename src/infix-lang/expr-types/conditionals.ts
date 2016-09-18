@@ -52,7 +52,7 @@ export function conditionalToJs(conditional: FConditional): string {
     );
   });
 
-  if (conditional.elseBlock.length > 0) {
+  if (conditional.elseBlock && conditional.elseBlock.length > 0) {
     result.push(
       `else { ${conditional.elseBlock.map(toJs)} }`
     )

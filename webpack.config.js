@@ -1,6 +1,6 @@
 module.exports = {
   entry: {
-    bundle: './src/main.ts',
+    fsc: './src/main.ts',
     test: './test/test.ts'
   },
   target: 'node',

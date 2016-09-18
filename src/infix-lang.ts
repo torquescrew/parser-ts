@@ -28,14 +28,14 @@ const beautify = require('js-beautify')['js_beautify'];
 const fTrue = word('true');
 const fFalse = word('false');
 const fLet = word('let');
-const fFun = word('fun');
+const fFun = word('def');
 const fEquals = char('=');
 
 const fIf = word('if');
 const fElseIf = word('else if');
 const fElse = word('else');
 
-const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'));
+const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'), word('=='));
 
 const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fIf, fElseIf, fElse, operator);
 
@@ -87,11 +87,11 @@ const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCal
 const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
 
 export function expr() {
-  return or(operation, infixFunCall, defVar, defFun, funCall, identifier, primitive, ifConditional, bracketed);
+  return or(operation, infixFunCall, defVar, defFun, funCall, identifier, primitive, ifConditional, bracketed, 'null');
 }
 
-export function test() {
-  const result = parseFile(many(expr).map(toJs), path.join(process.cwd(), 'example-code', 'e1.fs'));
+export function parseFileAtPath(filePath) {
+  const result = parseFile(many(expr).map(toJs), filePath);
 
   console.log(beautify(result));
 }

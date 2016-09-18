@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha ./dist/test.js",
     "watch": "webpack --watch",
-    "start": "node ./dist/bundle.js"
+    "start": "node ./dist/fsc.js ./example-code/e1.fs"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "@types/node": "^6.0.38",
     "@types/parsimmon": "^0.5.28",
     "@types/underscore": "^1.7.32",
+    "commander": "^2.9.0",
     "jest": "^15.1.1",
     "js-beautify": "^1.6.4",
     "mocha": "^3.0.2",
