@@ -70,7 +70,7 @@ export function regex(re: RegExp): IParser {
   });
 }
 
-export function or(...args: Array<IParser | string>): IParser {
+export function or(...args: Array<IParser2 | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
@@ -145,6 +145,24 @@ export function many(parser: IParser2): IParser {
       result = applyParser(parser, input);
     }
     return success(results);
+  });
+}
+
+export function many1(parser: IParser2): IParser {
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
+    let results: any[] = [];
+
+    let result = applyParser(parser, input);
+    while (result !== null) {
+      results.push(result);
+      result = applyParser(parser, input);
+    }
+
+    if (results.length > 0) {
+      return success(results);
+    }
+    fail(input.getInputData());
+    return noResult;
   });
 }
 

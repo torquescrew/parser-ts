@@ -1,5 +1,5 @@
 
-let  a =2
+let  a = (5 / 5) + 3 - 5
 
 a..times(2)
 
@@ -12,7 +12,7 @@ fun myFunc (a, c) {
 if true {
   let c = 5
 }
-else if false {
+else if (false) {
 
 }
 else {

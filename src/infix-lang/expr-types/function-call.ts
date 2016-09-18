@@ -19,9 +19,9 @@ export function mkFunctionCall(res): FunCall {
 }
 
 export function functionCallFail(input: IInputData, extra) {
-  if (extra && extra['parserIndex'] > 1) {
-    console.log('funCall parse error: ', input, extra);
-  }
+  // if (extra && extra['parserIndex'] > 1) {
+  //   console.log('funCall parse error: ', input, extra);
+  // }
 }
 
 export function mkFunCallInfix(res): FunCall {

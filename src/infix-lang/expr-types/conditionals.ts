@@ -39,9 +39,7 @@ function mkElseBlock(res): Expr[] {
   return res.map(c => c[1])[0];
 }
 
-export function conditionalToJs(conditional: FConditional) {
-  console.log(conditional);
-
+export function conditionalToJs(conditional: FConditional): string {
   let result: string[] = [];
 
   result.push(

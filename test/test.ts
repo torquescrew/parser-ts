@@ -22,6 +22,7 @@ function checkExprParse(type: string, code: string): void {
   describe(`"${code}"`, function() {
     it(`${type}`, function() {
       const result = parse(expr, code);
+      // console.log(JSON.stringify(result, null, 3));
       assert.equal(result['type'], type);
     });
   });
@@ -37,5 +38,11 @@ describe('conditionals', function() {
   // });
 });
 
+describe('operators', function() {
+  checkExprParse(ETypes.Operators, '5 * 5');
+  checkExprParse(ETypes.Operators, '5 * 5 + 3');
+  checkExprParse(ETypes.Operators, '(5 / 5) + 3 - 5');
+
+});
 
 

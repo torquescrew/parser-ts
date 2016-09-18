@@ -1,14 +1,26 @@
 import {
-  char, word, or, and, ident, not, __, many, parseAndPrint, stringLiteral,
-  number, repSep, parseAndPrintFile, parseFile
-} from './parser-lib/parsers-m';
-import {IInputData} from "./input";
-import * as path from 'path';
+  char,
+  word,
+  or,
+  and,
+  ident,
+  not,
+  __,
+  many,
+  many1,
+  stringLiteral,
+  number,
+  repSep,
+  parseFile
+} from "./parser-lib/parsers-m";
+import * as path from "path";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
-import {toJs, mkBool, mkNumber, mkString, mkIdentifier} from "./infix-lang/expr-types/expr";
+import {toJs, mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./infix-lang/expr-types/expr";
 import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function-definition";
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
+import {mkOperator} from "./infix-lang/expr-types/operation";
+
 
 const beautify = require('js-beautify')['js_beautify'];
 
@@ -23,8 +35,9 @@ const fIf = word('if');
 const fElseIf = word('else if');
 const fElse = word('else');
 
+const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'));
 
-const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fIf, fElseIf, fElse);
+const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fIf, fElseIf, fElse, operator);
 
 const fBool = or(fTrue, fFalse).map(mkBool);
 const fNumber = number.map(mkNumber);
@@ -66,9 +79,15 @@ const elseConditional = and(__, fElse, __, block, __);
 const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
   .map(mkConditional);
 
+const bracketed = and(__, '(', __, expr, __, ')', __)
+  .map(mkBracketed);
+
+const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCall, ifConditional);
+
+const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
 
 export function expr() {
-  return or(infixFunCall, identifier, primitive, defVar, defFun, funCall, ifConditional);
+  return or(operation, infixFunCall, defVar, defFun, funCall, identifier, primitive, ifConditional, bracketed);
 }
 
 export function test() {
