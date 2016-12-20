@@ -5,6 +5,7 @@
   "main": "./dist/bundle.js",
   "scripts": {
     "test": "mocha ./dist/test.js",
+    "testLisp": "mocha ./dist/lispTests.js",
     "watch": "webpack --watch --progress",
     "start": "node ./dist/fsc.js ./example-code/e1.fs"
   },

@@ -64,7 +64,21 @@ const quotedBlock = and('`(', __, argsBlock, ')');
 const jsCode = and('(', __, _jscode, __, argsBlock, __, ')');
 
 export function expr() {
-   return or(macroDef, primitive, funcCall, symbol, def, lambda, defn, list, lIf, quotedBlock, jsCode, and('(', __, expr, __, ')'));
+   // return def;
+   return or(
+      // macroDef,
+      primitive,
+      // funcCall,
+      // symbol,
+      def,
+      // lambda,
+      // defn,
+      list,
+      // lIf,
+      // quotedBlock,
+      // jsCode,
+      // and('(', __, expr, __, ')')
+   );
 }
 
 export function parseFileAtPath(filePath: string) {

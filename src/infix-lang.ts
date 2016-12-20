@@ -13,7 +13,6 @@ import {
   repSep,
   parseFile
 } from "./parser-lib/parsers-m";
-import * as path from "path";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
 import {toJs, mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./infix-lang/expr-types/expr";

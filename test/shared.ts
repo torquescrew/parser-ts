@@ -1,7 +1,7 @@
-var assert = require('assert');
 import {expr} from "../src/infix-lang";
 import {parse} from '../src/parser-lib/parsers-m';
 
+const assert = require('assert');
 
 
 export function checkExprParse(type: string, code: string): void {

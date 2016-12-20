@@ -1,7 +1,8 @@
 module.exports = {
   entry: {
     fsc: './src/main.ts',
-    test: './test/test.ts'
+    test: './test/test.ts',
+    lispTests: './test/lisp/test.ts'
   },
   target: 'node',
   output: {

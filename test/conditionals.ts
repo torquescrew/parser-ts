@@ -1,8 +1,6 @@
 import {checkExprParse} from "./shared";
-var assert = require('assert');
-import {expr} from "../src/infix-lang";
-import {parse} from '../src/parser-lib/parsers-m';
 import {ETypes} from "../src/infix-lang/expr-types/expr";
+// const assert = require('assert');
 
 
 describe('Conditionals:', function() {
