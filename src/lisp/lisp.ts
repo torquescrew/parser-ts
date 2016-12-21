@@ -64,20 +64,19 @@ const quotedBlock = and('`(', __, argsBlock, ')');
 const jsCode = and('(', __, _jscode, __, argsBlock, __, ')');
 
 export function expr() {
-   // return def;
    return or(
-      // macroDef,
+      macroDef,
       primitive,
-      // funcCall,
+      funcCall,
       // symbol,
       def,
-      // lambda,
-      // defn,
+      lambda,
+      defn,
       list,
-      // lIf,
-      // quotedBlock,
-      // jsCode,
-      // and('(', __, expr, __, ')')
+      lIf,
+      quotedBlock,
+      jsCode,
+      and('(', __, expr, __, ')')
    );
 }
 

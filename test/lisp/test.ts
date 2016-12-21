@@ -7,6 +7,7 @@ describe('expressions:', function() {
       console.log(parse(expr, 'false'));
       console.log(parse(expr, '5'));
       console.log(parse(expr, '(def a 1)'));
+      console.log(parse(expr, 'aa'));
 
    });
 });

@@ -1,6 +1,6 @@
 import {DefVar} from "./variable-definition";
 import {FunCall} from "./function-call";
-import {DefFun} from "./function-definition";
+import {DefFun, functionDefinitionToJs} from "./function-definition";
 import {FConditional, conditionalToJs} from "./conditionals";
 import {FOperators, operatorsToJs} from "./operation";
 
@@ -46,10 +46,7 @@ export function toJs(expr: any) {
       const funCall = expr as FunCall;
       return `${toJs(funCall.functionName)}(${funCall.arguments.map(toJs).join(', ')})`;
     case ETypes.FunctionDefinition:
-      const defFun = expr as DefFun;
-      const args = defFun.arguments.map(toJs).join(', ');
-      const block = defFun.block.map(toJs).join('\n');
-      return `function ${toJs(defFun.identifier)} (${args}) {\n ${block} \n }`;
+      return functionDefinitionToJs(expr as DefFun);
     case ETypes.Boolean:
       const bool = expr as FBool;
       return bool.value.toString();
