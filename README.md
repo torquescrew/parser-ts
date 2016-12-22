@@ -1,6 +1,8 @@
 ### Ideas
 
 - No special syntax for arrays? Seems like a waste of special syntax
+- Consider simplify record syntax (low priority)
+- named argument parameters always?
 
 ### Macros
 ```
@@ -49,4 +51,60 @@ Macro is evaluated after parse phase. This involves:
  
  ife! 3 == 3, println('true'), println('false'))
  
+```
+
+```javascript
+
+var a = 5;
+
+if (a == 5) {
+   console.log('hi');
+}
+
+a == 5 ? console.log('hi') : undefined;
+
+
+if (a == 5) {
+   console.log('a');
+}
+else if (a == 6) {
+   console.log('b');
+}
+
+a == 5 ? console.log('a') : (a == 6 ? console.log('b') : undefined);
+
+
+
+if (a == 5) {
+   console.log('a');
+}
+else if (a == 6) {
+   console.log('b');
+}
+else {
+   console.log('c');
+}
+
+a == 5 ? console.log('a') : (a == 6 ? console.log('b') : console.log('c'));
+
+
+
+if (a == 5) {
+   console.log('a');
+}
+else if (a == 6) {
+   console.log('b');
+}
+else if (a == 7) {
+   console.log('d');
+}
+else {
+   console.log('c');
+}
+
+a == 5 ? 
+  console.log('a') : (a == 6 ? 
+    console.log('b') : (a == 7 ? 
+      console.log('d') : console.log('c')));
+
 ```

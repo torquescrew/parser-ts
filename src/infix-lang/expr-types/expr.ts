@@ -71,6 +71,43 @@ export function toJs(expr: any) {
   }
 }
 
+export function returnLastExprInBlock(block: string[]): string[] {
+  if (block.length > 0) {
+    const i = block.length - 1;
+    block[i] = `return ${block[i]}`;
+  }
+  return block;
+}
+
+export function returnLastExprInBlock2(block: Expr[]) {
+  if (block.length > 0) {
+    const i = block.length - 1;
+
+    if (block[i].type === ETypes.VariableDefinition
+      || block[i].type === ETypes.FunctionDefinition) {
+
+    }
+  }
+}
+
+export function blockToJs(block: Expr[], returnLastExpr: boolean): string {
+  let results: string[] = block.map(toJs);
+
+  if (returnLastExpr && block.length > 0) {
+    const i = block.length - 1;
+
+    if (block[i].type === ETypes.VariableDefinition
+      || block[i].type === ETypes.FunctionDefinition) {
+      results.push('return');
+    }
+    else {
+      results[i] = `return ${results[i]}`;
+    }
+  }
+
+  return results.join('\n');
+}
+
 // TODO
 export function traverseTree(expr: any, f: (expr: Expr) => any) {
   // if (expr.isArray()) {
