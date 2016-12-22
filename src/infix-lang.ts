@@ -51,7 +51,7 @@ const defVar = and(__, fLet, __, identifier, __, fEquals, __, expr, __)
   .map(mkDefVar)
   .fail(defVarFail);
 
-const block = and('{', __, many(expr), __, '}')
+export const block = and('{', __, many(expr), __, '}')
   .map(res => res[1]);
 
 const argumentBlock = and(__, '(', __, repSep(identifier, ','), __, ')', __)

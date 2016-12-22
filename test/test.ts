@@ -1,8 +1,8 @@
 import {checkExprParse} from "./shared";
 // var assert = require('assert');
-// import {expr} from "../src/infix-lang";
-// import {parse} from '../src/parser-lib/parsers-m';
-import {ETypes} from "../src/infix-lang/expr-types/expr";
+import {expr, block} from "../src/infix-lang";
+import {parse, many} from '../src/parser-lib/parsers-m';
+import {ETypes, Expr, blockToJs} from "../src/infix-lang/expr-types/expr";
 
 import './conditionals';
 
@@ -31,4 +31,12 @@ describe('Functions Defs', function() {
   checkExprParse(ETypes.FunctionDefinition, 'def sqr(x) { x * x }');
 });
 
+
+describe('Function execution', () => {
+  const out = parse(block, '{ def sqr(x) { x * x } sqr(5) }') as Expr[];
+
+  const code: string = blockToJs(out, false);
+  console.log(code);
+  console.log(eval(code));
+});
 
