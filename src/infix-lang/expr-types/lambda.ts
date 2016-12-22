@@ -1,4 +1,4 @@
-import {Expr, ETypes, toJs, returnLastExprInBlock} from "./expr";
+import {Expr, ETypes, toJs, blockToJs} from "./expr";
 
 
 export interface Lambda extends Expr {
@@ -7,8 +7,6 @@ export interface Lambda extends Expr {
 }
 
 export function mkLambda(res): Lambda {
-  // console.log(res);
-
   return {
     type: ETypes.Lambda,
     arguments: res[0],
@@ -18,7 +16,7 @@ export function mkLambda(res): Lambda {
 
 export function lambdaToJs(lambda: Lambda): string {
   const args = lambda.arguments.map(toJs).join(', ');
-  const block = returnLastExprInBlock(lambda.block.map(toJs));
+  const block = blockToJs(lambda.block, true);
 
-  return `function (${args}) {\n ${block.join('\n')} \n }`;
+  return `function (${args}) {\n ${block} \n }`;
 }

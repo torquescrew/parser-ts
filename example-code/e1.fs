@@ -22,7 +22,7 @@ else {
 myFunc(5, 3)
 
 def char(c) {
-  def charInner(input) {
+  (input) => {
     let r = input..nextChar()
 
     if r == c {
@@ -33,8 +33,6 @@ def char(c) {
       null
     }
   }
-
-  charInner
 }
 
 def charInner(input) {

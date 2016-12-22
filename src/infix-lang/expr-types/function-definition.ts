@@ -1,4 +1,4 @@
-import {Expr, ETypes, toJs, returnLastExprInBlock} from "./expr";
+import {Expr, ETypes, toJs, blockToJs} from "./expr";
 import {IInputData} from "../../input";
 
 
@@ -26,8 +26,8 @@ export function functionDefinitionFail(input: IInputData, extra) {
 export function functionDefinitionToJs(defFun: DefFun): string {
   const args = defFun.arguments.map(toJs).join(', ');
 
-  const block = returnLastExprInBlock(defFun.block.map(toJs));
+  const block = blockToJs(defFun.block, true);
 
-  return `function ${toJs(defFun.identifier)} (${args}) {\n ${block.join('\n')} \n }`;
+  return `function ${toJs(defFun.identifier)} (${args}) {\n ${block} \n }`;
 }
 
