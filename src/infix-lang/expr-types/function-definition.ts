@@ -25,7 +25,6 @@ export function functionDefinitionFail(input: IInputData, extra) {
 
 export function functionDefinitionToJs(defFun: DefFun): string {
   const args = defFun.arguments.map(toJs).join(', ');
-
   const block = blockToJs(defFun.block, true);
 
   return `function ${toJs(defFun.identifier)} (${args}) {\n ${block} \n }`;

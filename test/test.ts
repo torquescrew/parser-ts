@@ -1,4 +1,4 @@
-import {checkExprParse} from "./shared";
+import {checkExprParse, evalCode} from "./shared";
 // var assert = require('assert');
 import {expr, block} from "../src/infix-lang";
 import {parse, many} from '../src/parser-lib/parsers-m';
@@ -37,10 +37,7 @@ describe('Lambdas', () => {
 });
 
 describe('Function execution', () => {
-  const out = parse(block, '{ def sqr(x) { x * x } sqr(5) }') as Expr[];
-
-  const code: string = blockToJs(out, false);
-  // console.log(code);
-  // console.log(eval(code));
+  evalCode('{ def sqr(x) { x * x } sqr(5) }', 25);
+  evalCode('{ let a = (x) => { x + 20 } a(2) }', 22);
 });
 
