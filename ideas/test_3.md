@@ -6,6 +6,44 @@
 - Consider simplify record syntax (low priority)
 - named argument parameters always?
 
+
+
+### Lambdas
+
+```
+
+list.map((e) => {
+
+})
+
+def char(c) {
+  (input) => {
+    let r = input..nextChar()
+  
+    if r == c {
+      input..advance()
+      c
+    }
+    else {
+      null
+    }
+  }
+}
+
+def charInner(input) {
+  let r = input..nextChar()
+
+  if r == c {
+    input..advance()
+    c
+  }
+  else {
+    null
+  }
+}
+
+```
+
 ### Macros
 ```
 
@@ -56,7 +94,51 @@ Macro is evaluated after parse phase. This involves:
 ```
 
 
-### Syntax
+### Syntax 
+
+```
+
+let  a = (3 / 5) + 3 - 5
+
+a..times(2)
+
+def myFunc (a, c) {
+  let a = 5
+  let b = 6
+  a..times(2)
+}
+
+if true {
+  let c = 5
+}
+else if (false) {
+
+}
+else {
+  let c = 9
+}
+
+myFunc(5, 3)
+
+def char(c) {
+  charInner
+}
+
+def charInner(input) {
+  let r = input..nextChar()
+
+  if r == c {
+    input..advance()
+    c
+  }
+  else {
+    null
+  }
+}
+
+```
+
+####(Old)
 ```python
 data Entities =
   current: Entity[]
@@ -123,10 +205,32 @@ obj2.b = 35;
 // Set obj.c.d = 4
 var obj2 = Object.assign({}, obj);
 var obj3 = Object.assign({}, obj2.c);
-obj2.c = obj3
+obj2.c = obj3;
 obj2.c.d = 4;
 
 obj // {a:5, b:34, c:{d:3, e:34}}
 obj2 // {a:5, b:34, c:{d:4, e:34}}
 
+```
+
+### Bugs
+
+- nested function defs don't work alongside other code
+
+```
+def char(c) {
+  def charInner(input) {
+    let r = input..nextChar()
+
+    if r == c {
+      input..advance()
+      c
+    }
+    else {
+      null
+    }
+  }
+
+  charInner
+}
 ```

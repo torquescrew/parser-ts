@@ -32,11 +32,15 @@ describe('Functions Defs', function() {
 });
 
 
+describe('Lambdas', () => {
+  checkExprParse(ETypes.Lambda, '(x) => { x * x }');
+});
+
 describe('Function execution', () => {
   const out = parse(block, '{ def sqr(x) { x * x } sqr(5) }') as Expr[];
 
   const code: string = blockToJs(out, false);
-  console.log(code);
-  console.log(eval(code));
+  // console.log(code);
+  // console.log(eval(code));
 });
 

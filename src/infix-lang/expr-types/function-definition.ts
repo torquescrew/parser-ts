@@ -28,11 +28,6 @@ export function functionDefinitionToJs(defFun: DefFun): string {
 
   const block = returnLastExprInBlock(defFun.block.map(toJs));
 
-  // if (block.length > 0) {
-  //   const i = block.length - 1;
-  //   block[i] = `return ${block[i]}`;
-  // }
-
   return `function ${toJs(defFun.identifier)} (${args}) {\n ${block.join('\n')} \n }`;
 }
 

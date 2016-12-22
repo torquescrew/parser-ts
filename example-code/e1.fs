@@ -22,6 +22,18 @@ else {
 myFunc(5, 3)
 
 def char(c) {
+  def charInner(input) {
+    let r = input..nextChar()
+
+    if r == c {
+      input..advance()
+      c
+    }
+    else {
+      null
+    }
+  }
+
   charInner
 }
 

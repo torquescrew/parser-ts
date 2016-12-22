@@ -19,6 +19,7 @@ import {toJs, mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./inf
 import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function-definition";
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
+import {mkLambda} from "./infix-lang/expr-types/lambda";
 
 
 const beautify = require('js-beautify')['js_beautify'];
@@ -29,6 +30,7 @@ const fFalse = word('false');
 const fLet = word('let');
 const fFun = word('def');
 const fEquals = char('=');
+const fArrow = word('=>');
 
 const fIf = word('if');
 const fElseIf = word('else if');
@@ -36,7 +38,7 @@ const fElse = word('else');
 
 const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'), word('=='));
 
-const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fIf, fElseIf, fElse, operator);
+const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fArrow, fIf, fElseIf, fElse, operator);
 
 const fBool = or(fTrue, fFalse).map(mkBool);
 const fNumber = number.map(mkNumber);
@@ -60,6 +62,9 @@ const argumentBlock = and(__, '(', __, repSep(identifier, ','), __, ')', __)
 const defFun = and(__, fFun, __, identifier, __, argumentBlock, __, block)
   .map(mkDefFun)
   .fail(functionDefinitionFail);
+
+const lambda = and(argumentBlock, fArrow, __, block)
+  .map(mkLambda);
 
 const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __)
   .map(res => res[1]);
@@ -86,7 +91,7 @@ const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCal
 const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
 
 export function expr() {
-  return or(operation, infixFunCall, defVar, defFun, funCall, identifier, primitive, ifConditional, bracketed, 'null');
+  return or(operation, infixFunCall, defVar, defFun, lambda, funCall, identifier, primitive, ifConditional, bracketed, 'null');
 }
 
 export function parseFileAtPath(filePath) {

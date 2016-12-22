@@ -3,12 +3,14 @@ import {FunCall} from "./function-call";
 import {DefFun, functionDefinitionToJs} from "./function-definition";
 import {FConditional, conditionalToJs} from "./conditionals";
 import {FOperators, operatorsToJs} from "./operation";
+import {lambdaToJs, Lambda} from "./lambda";
 
 
 export const ETypes = {
   Bracketed: 'Bracketed',
   VariableDefinition: 'VariableDefinition',
   FunctionDefinition: 'FunctionDefinition',
+  Lambda: 'Lambda',
   FunctionCall: 'FunctionCall',
   Boolean: 'Boolean',
   Number: 'Number',
@@ -47,6 +49,8 @@ export function toJs(expr: any) {
       return `${toJs(funCall.functionName)}(${funCall.arguments.map(toJs).join(', ')})`;
     case ETypes.FunctionDefinition:
       return functionDefinitionToJs(expr as DefFun);
+    case ETypes.Lambda:
+      return lambdaToJs(expr as Lambda);
     case ETypes.Boolean:
       const bool = expr as FBool;
       return bool.value.toString();
