@@ -1,10 +1,6 @@
 import {checkExprParse, evalCode} from "./shared";
-// var assert = require('assert');
-import {expr, block} from "../src/infix-lang";
-import {parse, many} from '../src/parser-lib/parsers-m';
-import {ETypes, Expr, blockToJs} from "../src/infix-lang/expr-types/expr";
-
-import './conditionals';
+import {ETypes} from "../src/infix-lang/expr-types/expr";
+import "./conditionals";
 
 
 describe('Simple expressions:', function() {
@@ -23,7 +19,6 @@ describe('Operators:', function() {
   checkExprParse(ETypes.Operators, '5 * 5 + 3');
   checkExprParse(ETypes.Operators, '(5 / 5) + 3 - 5');
   checkExprParse(ETypes.Operators, 'true == false');
-  // checkExprParse(ETypes.Operators, '(myFunc(5, 3) / 5) + 3 - 5');
 });
 
 

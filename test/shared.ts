@@ -16,7 +16,7 @@ export function checkExprParse(type: string, code: string): void {
 
 export function evalCode(code: string, result: any): void {
   describe(`"${code}"`, function() {
-    it(`equals ${result}`, function() {
+    it(`=> ${result}`, function() {
       const ast = parse(block, code) as Expr[];
       const jsCode = blockToJs(ast, false);
       assert.equal(eval(jsCode), result);
