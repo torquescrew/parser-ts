@@ -12,6 +12,7 @@ export const ETypes = {
   FunctionDefinition: 'FunctionDefinition',
   Lambda: 'Lambda',
   FunctionCall: 'FunctionCall',
+  List: 'List',
   Boolean: 'Boolean',
   Number: 'Number',
   String: 'String',

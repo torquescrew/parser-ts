@@ -6,6 +6,7 @@ import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
 import {mkLambda} from "./infix-lang/expr-types/lambda";
+import {mkList} from "./infix-lang/expr-types/list";
 
 
 const fTrue = word('true');
@@ -59,6 +60,9 @@ const funCall = and(__, identifier, argumentCallBlock)
 const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
   .map(mkFunCallInfix);
 
+const list = and('[', repSep(expr, ','), ']')
+  .map(mkList);
+
 const elseIfConditional = and(__, fElseIf, __, expr, __, block, __);
 
 const elseConditional = and(__, fElse, __, block, __);
@@ -70,11 +74,10 @@ const bracketed = and(__, '(', __, expr, __, ')', __)
   .map(mkBracketed);
 
 
-
 const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCall, ifConditional);
 
 const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
 
 export function expr() {
-  return or(operation, infixFunCall, defVar, defFun, lambda, funCall, identifier, primitive, ifConditional, bracketed, 'null');
+  return or(operation, infixFunCall, defVar, defFun, lambda, funCall, list, identifier, primitive, ifConditional, bracketed, 'null');
 }

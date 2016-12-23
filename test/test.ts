@@ -31,6 +31,10 @@ describe('Lambdas', () => {
   checkExprParse(ETypes.Lambda, '(x) => { x * x }');
 });
 
+describe('Lists', () => {
+  checkExprParse(ETypes.List, '[1, 2, 3]');
+});
+
 describe('Function execution', () => {
   evalCode('{ def sqr(x) { x * x } sqr(5) }', 25);
   evalCode('{ let a = (x) => { x + 20 } a(2) }', 22);
