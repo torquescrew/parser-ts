@@ -4,6 +4,7 @@ import {DefFun, functionDefinitionToJs} from "./function-definition";
 import {FConditional, conditionalToJs} from "./conditionals";
 import {FOperators, operatorsToJs} from "./operation";
 import {lambdaToJs, Lambda} from "./lambda";
+import {listToJs, List} from "./list";
 
 
 export const ETypes = {
@@ -52,6 +53,8 @@ export function toJs(expr: any) {
       return functionDefinitionToJs(expr as DefFun);
     case ETypes.Lambda:
       return lambdaToJs(expr as Lambda);
+    case ETypes.List:
+      return listToJs(expr as List);
     case ETypes.Boolean:
       const bool = expr as FBool;
       return bool.value.toString();
