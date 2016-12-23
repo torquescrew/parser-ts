@@ -221,42 +221,7 @@ export function parse(parser: IParser2, code: string) {
   const result = applyParser(parser, input);
 
   return result;
-  // if (result === null) {
-  //   return 'Compile failed.';
-  // }
-  // else {
-  //   return result;
-  // }
 }
-
-// export function parseAndPrintFile(parser: IParser, fileName: string) {
-//   const input = makeInputFromFile(fileName);
-//   if (input !== null) {
-//     const result = applyParser(parser, input);
-//
-//     if (result === null) {
-//       console.log('Compile failed.');
-//     }
-//     else {
-//       console.log(result);
-//     }
-//   }
-// }
-
-// export function parseFile(parser: IParser, fileName: string): string {
-//   const input = makeInputFromFile(fileName);
-//   if (input !== null) {
-//     const result = applyParser(parser, input);
-//
-//     if (result === null) {
-//       return 'Compile failed.';
-//     }
-//     else {
-//       return result;
-//     }
-//   }
-//   return 'failed to read file';
-// }
 
 export function applyParser(parser: IParser2, input: Input) {
   if (parser['length'] === 0) {

@@ -16,7 +16,7 @@ interface EditorState {
 export default class Editors extends React.Component<{}, EditorState> {
 
   state: EditorState = {
-    code: 'def myFunc (a, c) {\n  let a = 5\n  let b = 6\n  a..times(2)\n}',
+    code: 'def times(a, b) {\n  a * b\n}\nlet a = 6\na..times(b)',
     outputCode: ''
   };
 
@@ -34,7 +34,6 @@ export default class Editors extends React.Component<{}, EditorState> {
         outputCode: beautify(jsCode)
       });
     }
-
 
     console.log(+new Date() - t1);
   };
