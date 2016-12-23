@@ -1,20 +1,7 @@
-import {
-  char,
-  word,
-  or,
-  and,
-  ident,
-  not,
-  __,
-  many,
-  many1,
-  stringLiteral,
-  number,
-  repSep
-} from "./parser-lib/parsers-m";
+import {char, word, or, and, ident, not, __, many, many1, stringLiteral, number, repSep} from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
-import {toJs, mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./infix-lang/expr-types/expr";
+import {mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./infix-lang/expr-types/expr";
 import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function-definition";
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
@@ -82,6 +69,8 @@ const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional),
 const bracketed = and(__, '(', __, expr, __, ')', __)
   .map(mkBracketed);
 
+
+
 const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCall, ifConditional);
 
 const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
@@ -89,10 +78,3 @@ const operation = and(operatableExpr, __, many1(and(__, operator, __, operatable
 export function expr() {
   return or(operation, infixFunCall, defVar, defFun, lambda, funCall, identifier, primitive, ifConditional, bracketed, 'null');
 }
-
-// export function parseFileAtPath(filePath) {
-//   const result = parseFile(many(expr).map(toJs), filePath);
-//
-//   const beautify = require('js-beautify')['js_beautify'];
-//   console.log(beautify(result));
-// }

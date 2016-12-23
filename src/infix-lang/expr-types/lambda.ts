@@ -2,7 +2,7 @@ import {Expr, ETypes, toJs, blockToJs} from "./expr";
 
 
 export interface Lambda extends Expr {
-  arguments: string[];
+  arguments: Expr[];
   block: Expr[];
 }
 

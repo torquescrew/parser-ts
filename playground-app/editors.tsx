@@ -59,7 +59,6 @@ export default class Editors extends React.Component<{}, EditorState> {
             theme="monokai"
             height="100%"
             width="100%"
-            onChange={this.onCodeChange}
             name="rightEditorId"
             editorProps={{$blockScrolling: true}}
             value={this.state.outputCode}
