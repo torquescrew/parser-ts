@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as fs from 'fs';
 
 
@@ -59,21 +58,21 @@ export class Input {
   }
 }
 
-export function makeInputFromFile(filePath: string): Input | null {
-  try {
-    fs.statSync(filePath);
-
-    const fileContent = fs.readFileSync(filePath).toString();
-
-    if (fileContent) {
-      const code = fileContent.replace(/[\r\n]+/g, " ");
-
-      return new Input(code);
-    }
-  }
-  catch (e) {
-    console.log(e);
-    return null;
-  }
-  return null;
-}
+// export function makeInputFromFile(filePath: string): Input | null {
+//   try {
+//     fs.statSync(filePath);
+//
+//     const fileContent = fs.readFileSync(filePath).toString();
+//
+//     if (fileContent) {
+//       const code = fileContent.replace(/[\r\n]+/g, " ");
+//
+//       return new Input(code);
+//     }
+//   }
+//   catch (e) {
+//     console.log(e);
+//     return null;
+//   }
+//   return null;
+// }

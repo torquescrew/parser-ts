@@ -10,8 +10,7 @@ import {
   many1,
   stringLiteral,
   number,
-  repSep,
-  parseFile
+  repSep
 } from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
@@ -20,9 +19,6 @@ import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
 import {mkLambda} from "./infix-lang/expr-types/lambda";
-
-
-const beautify = require('js-beautify')['js_beautify'];
 
 
 const fTrue = word('true');
@@ -94,8 +90,9 @@ export function expr() {
   return or(operation, infixFunCall, defVar, defFun, lambda, funCall, identifier, primitive, ifConditional, bracketed, 'null');
 }
 
-export function parseFileAtPath(filePath) {
-  const result = parseFile(many(expr).map(toJs), filePath);
-
-  console.log(beautify(result));
-}
+// export function parseFileAtPath(filePath) {
+//   const result = parseFile(many(expr).map(toJs), filePath);
+//
+//   const beautify = require('js-beautify')['js_beautify'];
+//   console.log(beautify(result));
+// }

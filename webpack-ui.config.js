@@ -44,7 +44,9 @@ function getExternals() {
       // phantomjs related.
       'system',
       'webpage',
-      'phantomjs-prebuilt'
+      'phantomjs-prebuilt',
+
+      'fs'
    ];
 
    var externals = {};

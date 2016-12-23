@@ -1,4 +1,4 @@
-import {Input, makeInputFromFile} from "../input";
+import {Input} from "../input";
 import * as util from "../util";
 import {noResult, SuccessFunc, FailFunc, RawParser, WrappedParser, IParser, IParser2, mkParser} from "./types";
 
@@ -46,7 +46,7 @@ export function word(str: string): IParser {
 
 export function optionalWhiteSpace(): IParser {
   return mkParser((input: Input, handleResult) => {
-    while (input.nextChar() === ' ') {
+    while (input.nextChar() === ' ' || input.nextChar() === '\n') {
       input.advance();
     }
 
@@ -220,42 +220,43 @@ export function parse(parser: IParser2, code: string) {
   const input = new Input(code);
   const result = applyParser(parser, input);
 
-  if (result === null) {
-    return 'Compile failed.';
-  }
-  else {
-    return result;
-  }
+  return result;
+  // if (result === null) {
+  //   return 'Compile failed.';
+  // }
+  // else {
+  //   return result;
+  // }
 }
 
-export function parseAndPrintFile(parser: IParser, fileName: string) {
-  const input = makeInputFromFile(fileName);
-  if (input !== null) {
-    const result = applyParser(parser, input);
+// export function parseAndPrintFile(parser: IParser, fileName: string) {
+//   const input = makeInputFromFile(fileName);
+//   if (input !== null) {
+//     const result = applyParser(parser, input);
+//
+//     if (result === null) {
+//       console.log('Compile failed.');
+//     }
+//     else {
+//       console.log(result);
+//     }
+//   }
+// }
 
-    if (result === null) {
-      console.log('Compile failed.');
-    }
-    else {
-      console.log(result);
-    }
-  }
-}
-
-export function parseFile(parser: IParser, fileName: string): string {
-  const input = makeInputFromFile(fileName);
-  if (input !== null) {
-    const result = applyParser(parser, input);
-
-    if (result === null) {
-      return 'Compile failed.';
-    }
-    else {
-      return result;
-    }
-  }
-  return 'failed to read file';
-}
+// export function parseFile(parser: IParser, fileName: string): string {
+//   const input = makeInputFromFile(fileName);
+//   if (input !== null) {
+//     const result = applyParser(parser, input);
+//
+//     if (result === null) {
+//       return 'Compile failed.';
+//     }
+//     else {
+//       return result;
+//     }
+//   }
+//   return 'failed to read file';
+// }
 
 export function applyParser(parser: IParser2, input: Input) {
   if (parser['length'] === 0) {

@@ -1,7 +1,4 @@
-import {
-   word, char, or, ident, not, and, repSep, many, __, number, stringLiteral, many1,
-   parseFile
-} from "../parser-lib/parsers-m";
+import {word, char, or, ident, not, and, repSep, many, __, number, stringLiteral, many1} from "../parser-lib/parsers-m";
 import {toJs} from "../infix-lang/expr-types/expr";
 
 
@@ -78,11 +75,4 @@ export function expr() {
       jsCode,
       and('(', __, expr, __, ')')
    );
-}
-
-export function parseFileAtPath(filePath: string) {
-   const result = parseFile(many(expr).map(toJs), filePath);
-
-   const beautify = require('js-beautify')['js_beautify'];
-   console.log(beautify(result));
 }
