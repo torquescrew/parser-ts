@@ -12,6 +12,10 @@ export const stringLiteral: IParser = regex(/"([^"\\]|\\.)*"/);
 export const ident: IParser = regex(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*/);
 
 
+function isWhiteSpace(val: string): boolean {
+  return val === ' ' || val === '\n';
+}
+
 export function char(c: string): IParser {
   return mkParser((input: Input, handleResult) => {
     let r = input.nextChar();
@@ -46,11 +50,34 @@ export function word(str: string): IParser {
 
 export function optionalWhiteSpace(): IParser {
   return mkParser((input: Input, handleResult) => {
-    while (input.nextChar() === ' ' || input.nextChar() === '\n') {
+    while (isWhiteSpace(input.nextChar())) {
       input.advance();
     }
 
     return handleResult('');
+  });
+}
+
+export function precedingWhiteSpace(): IParser {
+  return mkParser((input: Input, handleResult) => {
+    let found = false;
+
+    if (isWhiteSpace(input.nextChar())) {
+      found = true;
+    }
+
+    const prevChar = input.prevChar();
+
+    if (prevChar !== null && isWhiteSpace(prevChar)) {
+      found = true;
+    }
+
+    if (found) {
+      return handleResult(' ');
+    }
+    else {
+      return noResult;
+    }
   });
 }
 

@@ -1,4 +1,7 @@
-import {char, word, or, and, ident, not, __, many, many1, stringLiteral, number, repSep} from "./parser-lib/parsers-m";
+import {
+  char, word, or, and, ident, not, __, many, many1, stringLiteral, number, repSep,
+  precedingWhiteSpace
+} from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
 import {mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./infix-lang/expr-types/expr";
@@ -60,8 +63,12 @@ const funCall = and(__, identifier, argumentCallBlock)
 const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
   .map(mkFunCallInfix);
 
-const list = and('[', repSep(expr, ','), ']')
+const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
+
+const indexIntoList = and(expr, '[', fNumber, ']');
+
+// const lists = or()
 
 const elseIfConditional = and(__, fElseIf, __, expr, __, block, __);
 
@@ -79,5 +86,5 @@ const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCal
 const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
 
 export function expr() {
-  return or(operation, infixFunCall, defVar, defFun, lambda, funCall, list, identifier, primitive, ifConditional, bracketed, 'null');
+  return or(operation, infixFunCall, defVar, defFun, lambda, funCall, listConstructor, identifier, primitive, ifConditional, bracketed, 'null');
 }

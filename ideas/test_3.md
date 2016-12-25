@@ -7,20 +7,6 @@
 - named argument parameters always?
 
 
-### Arrays/Lists
-
- - Comma separation required?
- - Merge syntax with object literals?
- 
-```
-
-let a = [1, 2, 3]
-
-
-
-```
-
-
 ### Lambdas
 
 ```

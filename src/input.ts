@@ -35,6 +35,15 @@ export class Input {
     return this.code[this.position];
   }
 
+  prevChar(): string | null {
+    if (this.position !== 0) {
+      return this.code[this.position - 1];
+    }
+    else {
+      return null;
+    }
+  }
+
   rest(): string {
     return this.code.slice(this.position);
   }
