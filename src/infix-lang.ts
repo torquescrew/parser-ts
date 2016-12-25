@@ -1,6 +1,6 @@
 import {
   char, word, or, and, ident, not, __, many, many1, stringLiteral, number, repSep,
-  precedingWhiteSpace
+  precedingWhiteSpace, repSep2
 } from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
@@ -36,24 +36,24 @@ const primitive = or(fNumber, fString, fBool);
 const identifier = and(not(reserved), ident)
   .map(mkIdentifier);
 
-const defVar = and(__, fLet, __, identifier, __, fEquals, __, expr, __)
+const defVar = and(fLet, __, identifier, __, fEquals, __, expr)
   .map(mkDefVar)
   .fail(defVarFail);
 
-export const block = and('{', __, many(expr), __, '}')
+export const block = and('{', __, repSep2(expr, __), __, '}')
   .map(res => res[1]);
 
-const argumentBlock = and(__, '(', __, repSep(identifier, ','), __, ')', __)
+const argumentBlock = and('(', __, repSep(identifier, ','), __, ')')
   .map(res => res[1]);
 
-const defFun = and(__, fFun, __, identifier, __, argumentBlock, __, block)
+const defFun = and(fFun, __, identifier, __, argumentBlock, __, block)
   .map(mkDefFun)
   .fail(functionDefinitionFail);
 
-const lambda = and(argumentBlock, fArrow, __, block)
+const lambda = and(argumentBlock, __, fArrow, __, block)
   .map(mkLambda);
 
-const argumentCallBlock = and(__, '(', __, repSep(expr, ','), __, ')', __)
+const argumentCallBlock = and('(', __, repSep(expr, ','), __, ')')
   .map(res => res[1]);
 
 const funCall = and(__, identifier, argumentCallBlock)
@@ -70,14 +70,15 @@ const indexIntoList = and(expr, '[', fNumber, ']');
 
 // const lists = or()
 
-const elseIfConditional = and(__, fElseIf, __, expr, __, block, __);
+const elseIfConditional = and(fElseIf, __, expr, __, block, __);
 
 const elseConditional = and(__, fElse, __, block, __);
 
+// TODO: "many(elseConditional)" should only accept 0 or 1.
 const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
   .map(mkConditional);
 
-const bracketed = and(__, '(', __, expr, __, ')', __)
+const bracketed = and('(', __, expr, __, ')')
   .map(mkBracketed);
 
 

@@ -220,6 +220,32 @@ export function repSep(parser: IParser2, separator: string): IParser {
   });
 }
 
+export function repSep2(parser: IParser2, separator: IParser2): IParser {
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
+    let results: any[] = [];
+    // let sepParser = and(__, separator, __);
+
+    let result = applyParser(parser, input);
+    while (result !== noResult) {
+      results.push(result);
+
+      let sepRes = applyParser(separator, input);
+      if (sepRes !== noResult) {
+        result = applyParser(parser, input);
+      }
+      else {
+        result = noResult;
+      }
+    }
+    // if (results.length === 0) {
+    //   fail(input.getInputData());
+    //   return noResult;
+    // }
+
+    return success(results);
+  });
+}
+
 function test() {
 
   parseAndPrint(and(char('b'), char('c').map(c => c)).map((r: string[]) => {return r.join('')}), 'bc');
