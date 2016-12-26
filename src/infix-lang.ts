@@ -20,7 +20,7 @@ import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
 import {mkLambda} from "./infix-lang/expr-types/lambda";
-import {mkList} from "./infix-lang/expr-types/list";
+import {mkList, mkIndexIntoList} from "./infix-lang/expr-types/list";
 import * as _ from "underscore";
 import {IParser, WrappedParser} from "./parser-lib/types";
 
@@ -40,7 +40,7 @@ const fNull = word('null');
 
 const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'), word('=='));
 
-const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fArrow, fIf, fElseIf, fElse, operator, fNull, char('['), char(']'));
+const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fArrow, fIf, fElseIf, fElse, operator, fNull);
 
 const fBool = or(fTrue, fFalse).map(mkBool);
 const fNumber = number.map(mkNumber);
@@ -83,10 +83,8 @@ const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
 const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
 
-// expr is not allowed to be indexIntoList
-export const indexIntoList = and(exprWithout('indexIntoList'), '[', fNumber, ']');
-
-// export const lists = or(listConstructor, indexIntoList);
+export const indexIntoList = and(exprWithout('indexIntoList', 'operation'), '[', fNumber, ']')
+  .map(mkIndexIntoList);
 
 const elseIfConditional = and(fElseIf, __, expr, __, block);
 
@@ -99,9 +97,10 @@ const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional),
 const bracketed = and('(', __, expr, __, ')')
   .map(mkBracketed);
 
-const operatableExpr = exprWithout('operation', 'indexIntoList');
+const operableExpr = exprWithout('operation');
 
-const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
+const operation = and(operableExpr, __, many1(and(__, operator, __, operableExpr)))
+  .map(mkOperator);
 
 export function expr(): IParser {
   return exprWithout()();
@@ -111,6 +110,7 @@ function exprWithout(...without: string[]): WrappedParser {
   return () => {
     const parsers = {
       operation,
+      indexIntoList,
       infixFunCall,
       defVar,
       defFun,
@@ -120,7 +120,6 @@ function exprWithout(...without: string[]): WrappedParser {
       primitive,
       listConstructor,
       ifConditional,
-      indexIntoList,
       bracketed,
       fNull
     };
