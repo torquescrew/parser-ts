@@ -32,7 +32,9 @@ export class Input {
   }
 
   nextChar(): string {
-    return this.code[this.position];
+    const char = this.code[this.position];
+    // console.log(char);
+    return char;
   }
 
   prevChar(): string | null {

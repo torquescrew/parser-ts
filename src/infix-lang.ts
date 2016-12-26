@@ -1,6 +1,17 @@
 import {
-  char, word, or, and, ident, not, __, many, many1, stringLiteral, number, repSep,
-  precedingWhiteSpace, repSep2
+  char,
+  word,
+  or,
+  and,
+  ident,
+  not,
+  __,
+  many,
+  many1,
+  stringLiteral,
+  number,
+  repSep,
+  repSep2
 } from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
@@ -10,6 +21,8 @@ import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
 import {mkLambda} from "./infix-lang/expr-types/lambda";
 import {mkList} from "./infix-lang/expr-types/list";
+import * as _ from "underscore";
+import {IParser, WrappedParser} from "./parser-lib/types";
 
 
 const fTrue = word('true');
@@ -23,9 +36,11 @@ const fIf = word('if');
 const fElseIf = word('else if');
 const fElse = word('else');
 
+const fNull = word('null');
+
 const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'), word('=='));
 
-const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fArrow, fIf, fElseIf, fElse, operator);
+const reserved = or(fTrue, fFalse, fLet, fFun, fEquals, fArrow, fIf, fElseIf, fElse, operator, fNull, char('['), char(']'));
 
 const fBool = or(fTrue, fFalse).map(mkBool);
 const fNumber = number.map(mkNumber);
@@ -40,7 +55,9 @@ const defVar = and(fLet, __, identifier, __, fEquals, __, expr)
   .map(mkDefVar)
   .fail(defVarFail);
 
-export const block = and('{', __, repSep2(expr, __), __, '}')
+export const exprs = repSep2(expr, __);
+
+export const block = and('{', __, exprs, __, '}')
   .map(res => res[1]);
 
 const argumentBlock = and('(', __, repSep(identifier, ','), __, ')')
@@ -66,13 +83,14 @@ const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
 const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
 
-const indexIntoList = and(expr, '[', fNumber, ']');
+// expr is not allowed to be indexIntoList
+export const indexIntoList = and(exprWithout('indexIntoList'), '[', fNumber, ']');
 
-// const lists = or()
+// export const lists = or(listConstructor, indexIntoList);
 
-const elseIfConditional = and(fElseIf, __, expr, __, block, __);
+const elseIfConditional = and(fElseIf, __, expr, __, block);
 
-const elseConditional = and(__, fElse, __, block, __);
+const elseConditional = and(__, fElse, __, block);
 
 // TODO: "many(elseConditional)" should only accept 0 or 1.
 const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
@@ -81,11 +99,36 @@ const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional),
 const bracketed = and('(', __, expr, __, ')')
   .map(mkBracketed);
 
-
-const operatableExpr = or(bracketed, infixFunCall, identifier, primitive, funCall, ifConditional);
+const operatableExpr = exprWithout('operation', 'indexIntoList');
 
 const operation = and(operatableExpr, __, many1(and(__, operator, __, operatableExpr))).map(mkOperator);
 
-export function expr() {
-  return or(operation, infixFunCall, defVar, defFun, lambda, funCall, listConstructor, identifier, primitive, ifConditional, bracketed, 'null');
+export function expr(): IParser {
+  return exprWithout()();
+}
+
+function exprWithout(...without: string[]): WrappedParser {
+  return () => {
+    const parsers = {
+      operation,
+      infixFunCall,
+      defVar,
+      defFun,
+      lambda,
+      funCall,
+      identifier,
+      primitive,
+      listConstructor,
+      ifConditional,
+      indexIntoList,
+      bracketed,
+      fNull
+    };
+
+    const remaining: any = _.omit(parsers, without);
+
+    const a = _.toArray(remaining) as IParser[];
+
+    return or(...a);
+  }
 }

@@ -1,7 +1,8 @@
 import {checkExprParse, evalCode} from "./shared";
 import {ETypes} from "../src/infix-lang/expr-types/expr";
-import "./conditionals";
 
+
+import "./conditionals";
 
 describe('Simple expressions:', function() {
   checkExprParse(ETypes.VariableDefinition, 'let a = 5');
@@ -9,7 +10,7 @@ describe('Simple expressions:', function() {
   checkExprParse(ETypes.Number, '3');
   checkExprParse(ETypes.Number, '-3.6');
   checkExprParse(ETypes.String, '"hi there"');
-  checkExprParse(ETypes.Identifier, 'squareNum2');
+  checkExprParse(ETypes.Identifier, 'square[Num2');
   checkExprParse(ETypes.FunctionCall, 'a..times(2)');
 });
 
@@ -36,7 +37,7 @@ describe('Lists', () => {
 });
 
 describe('Function execution', () => {
-  evalCode('{ def sqr(x) { x * x } sqr(5) }', 25);
-  evalCode('{ let a = (x) => { x + 20 } a(2) }', 22);
+  evalCode('def sqr(x) { x * x } sqr(5)', 25);
+  evalCode('let a = (x) => { x + 20 } a(2)', 22);
 });
 
