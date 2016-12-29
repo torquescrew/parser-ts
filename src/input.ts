@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 
 export interface IInputData {
   position: number;
@@ -32,9 +30,7 @@ export class Input {
   }
 
   nextChar(): string {
-    const char = this.code[this.position];
-    // console.log(char);
-    return char;
+    return this.code[this.position];
   }
 
   prevChar(): string | null {

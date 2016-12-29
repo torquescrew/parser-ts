@@ -23,6 +23,7 @@ import {mkLambda} from "./infix-lang/expr-types/lambda";
 import {mkList, mkIndexIntoList} from "./infix-lang/expr-types/list";
 import * as _ from "underscore";
 import {IParser, WrappedParser} from "./parser-lib/types";
+import {mkObjectLiteral} from "./infix-lang/expr-types/object-literal";
 
 
 const fTrue = word('true');
@@ -83,6 +84,13 @@ const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
 const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
 
+
+const keyValuePair = and(__, identifier, __, ':', __, expr, __);
+
+const objectConstructor = and('{', many(keyValuePair), '}')
+  .map(mkObjectLiteral);
+
+
 export const indexIntoList = and(exprWithout('indexIntoList', 'operation'), '[', fNumber, ']')
   .map(mkIndexIntoList);
 
@@ -109,6 +117,7 @@ export function expr(): IParser {
 function exprWithout(...without: string[]): WrappedParser {
   return () => {
     const parsers = {
+      objectConstructor,
       operation,
       indexIntoList,
       infixFunCall,

@@ -41,6 +41,11 @@ describe('Lists', () => {
   evalCode('let a = [1, 12, 9] a[1] + 2', 14);
 });
 
+describe('Object literals', () => {
+  checkExprParse(ETypes.ObjectLiteral, '{ a: 1 }');
+  checkExprParse(ETypes.ObjectLiteral, '{ position: 0 code: "let a = 5" }');
+});
+
 describe('Function execution', () => {
   evalCode('def sqr(x) { x * x } sqr(5)', 25);
   evalCode('let a = (x) => { x + 20 } a(2)', 22);

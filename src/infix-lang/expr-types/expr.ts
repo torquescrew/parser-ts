@@ -20,7 +20,8 @@ export const ETypes = {
   String: 'String',
   Identifier: 'Identifier',
   Conditional: 'Conditional',
-  Operators: 'Operators'
+  Operators: 'Operators',
+  ObjectLiteral: 'ObjectLiteral'
 };
 
 export interface Expr {

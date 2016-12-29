@@ -58,29 +58,6 @@ export function optionalWhiteSpace(): IParser {
   });
 }
 
-export function precedingWhiteSpace(): IParser {
-  return mkParser((input: Input, handleResult) => {
-    let found = false;
-
-    if (isWhiteSpace(input.nextChar())) {
-      found = true;
-    }
-
-    const prevChar = input.prevChar();
-
-    if (prevChar !== null && isWhiteSpace(prevChar)) {
-      found = true;
-    }
-
-    if (found) {
-      return handleResult(' ');
-    }
-    else {
-      return noResult;
-    }
-  });
-}
-
 export function regex(re: RegExp): IParser {
   return mkParser((input: Input, success: SuccessFunc) => {
     const code = input.rest();

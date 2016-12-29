@@ -24,3 +24,26 @@ defMacro! list(block) {
 }
 
 ```
+
+
+### Object Literals/Records
+
+```
+
+let input = {
+   position: 0
+   code: 'let a = 5'
+}
+
+def times[a: number b: number] {
+  a * b
+}
+
+times[a: a b: b]
+or
+times(a, b)
+
+
+
+```
+
