@@ -42,6 +42,7 @@ describe('Lists', () => {
 });
 
 describe('Object literals', () => {
+  checkExprParse(ETypes.ObjectLiteral, '{ }');
   checkExprParse(ETypes.ObjectLiteral, '{ a: 1 }');
   checkExprParse(ETypes.ObjectLiteral, '{ position: 0 code: "let a = 5" }');
 });

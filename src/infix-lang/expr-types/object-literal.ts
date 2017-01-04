@@ -1,29 +1,41 @@
-import {Expr, FIdentifier, ETypes} from "./expr";
+import {Expr, FIdentifier, ETypes, toJs} from "./expr";
 
 
-export interface keyValuePair {
+export interface KeyValuePair {
   identifier: FIdentifier;
   expr: Expr;
 }
 
+function keyValuePairToJs(pair: KeyValuePair): string {
+  return `${toJs(pair.identifier)}: ${toJs(pair.expr)}`;
+}
+
 export interface ObjectLiteral extends Expr {
-  keyValues: {[identifier: string]: Expr};
+  pairs: KeyValuePair[];
 }
 
 export function mkObjectLiteral(res) {
-  const pairs = res[1] as Array<Array<any>>;
-  let keyValues = {};
+  const pairsOb = res[1] as Array<Array<any>>;
+  let pairs: KeyValuePair[] = [];
 
-  pairs.forEach((pair) => {
-    keyValues[pair[0]] = pair[1];
+  pairsOb.forEach((pair) => {
+    pairs.push({
+      identifier: pair[0],
+      expr: pair[2]
+    });
   });
 
   return {
     type: ETypes.ObjectLiteral,
-    keyValues: keyValues
+    pairs: pairs
   };
 }
 
-export function objectLiteralToJs(obj: ObjectLiteral) {
-  
+export function objectLiteralToJs(obj: ObjectLiteral): string {
+
+  const strs = obj.pairs.map((pair) => {
+    return keyValuePairToJs(pair);
+  });
+
+  return `{ ${strs.join(', ')} }`;
 }

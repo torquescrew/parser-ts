@@ -85,9 +85,9 @@ const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
 
 
-const keyValuePair = and(__, identifier, __, ':', __, expr, __);
+const keyValuePair = and(__, identifier, __, ':', __, expr);
 
-const objectConstructor = and('{', many(keyValuePair), '}')
+const objectConstructor = and('{', many(keyValuePair), __, '}')
   .map(mkObjectLiteral);
 
 

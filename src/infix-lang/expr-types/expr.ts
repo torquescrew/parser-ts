@@ -5,6 +5,7 @@ import {FConditional, conditionalToJs} from "./conditionals";
 import {FOperators, operatorsToJs} from "./operation";
 import {lambdaToJs, Lambda} from "./lambda";
 import {listToJs, List, indexIntoListToJs, IndexIntoList} from "./list";
+import {objectLiteralToJs, ObjectLiteral} from "./object-literal";
 
 
 export const ETypes = {
@@ -39,7 +40,7 @@ export function mkBracketed(res): FBracketed {
   };
 }
 
-export function toJs(expr: any) {
+export function toJs(expr: any): string {
   if (expr instanceof Array) {
     return expr.map(toJs).join('\n');
   }
@@ -55,6 +56,8 @@ export function toJs(expr: any) {
       return functionDefinitionToJs(expr as DefFun);
     case ETypes.Lambda:
       return lambdaToJs(expr as Lambda);
+    case ETypes.ObjectLiteral:
+      return objectLiteralToJs(expr as ObjectLiteral);
     case ETypes.List:
       return listToJs(expr as List);
     case ETypes.IndexIntoList:
@@ -100,23 +103,6 @@ export function blockToJs(block: Expr[], returnLastExpr: boolean): string {
 
   return results.join('\n');
 }
-
-// TODO
-export function traverseTree(expr: any, f: (expr: Expr) => any) {
-  // if (expr.isArray()) {
-  //
-  // }
-
-  switch (expr.type) {
-    case ETypes.VariableDefinition:
-      const variableDefinition = expr as DefVar;
-      // traverseTree(variableDefinition.)
-  }
-}
-
-// function isExpr(e: Expr): boolean {
-//   return e.type && ETypes[e.type] === e.type;
-// }
 
 export interface FBool extends Expr {
   value: boolean;

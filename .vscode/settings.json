@@ -1,4 +1,5 @@
 {
     "typescript.tsdk": "./node_modules/typescript/lib",
-    "editor.fontFamily": "Monaco, 'Courier New', monospace"
+    "editor.fontFamily": "Monaco, 'Courier New', monospace",
+    "files.autoSave": "onFocusChange"
 }
