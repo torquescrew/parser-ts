@@ -124,7 +124,7 @@ export function expr(): IParser {
 function exprWithout(...without: string[]): WrappedParser {
   return () => {
     const parsers = {
-      // accessObjectElement,
+      accessObjectElement,
       objectConstructor,
       operation,
       indexIntoList,

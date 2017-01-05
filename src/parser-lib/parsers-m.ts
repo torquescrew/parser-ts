@@ -1,6 +1,6 @@
 import {Input} from "../input";
 import * as util from "../util";
-import {noResult, SuccessFunc, FailFunc, RawParser, WrappedParser, IParser, IParser2, mkParser} from "./types";
+import {noOutput, SuccessFunc, FailFunc, RawParser, WrappedParser, IParser, IParser2, mkParser} from "./types";
 
 
 export const __: IParser = optionalWhiteSpace();
@@ -20,7 +20,7 @@ export function char(c: string): IParser {
   return mkParser((input: Input, handleResult) => {
     let r = input.nextChar();
 
-    let result: any | null = noResult;
+    let result: any | null = noOutput;
 
     if (r === c) {
       input.advance();
@@ -41,7 +41,7 @@ export function word(str: string): IParser {
       }
       else {
         input.setPosition(pos);
-        return noResult;
+        return noOutput;
       }
     }
     return handleResult(str);
@@ -69,7 +69,7 @@ export function regex(re: RegExp): IParser {
       return success(result);
     }
     else {
-      return noResult;
+      return noOutput;
     }
   });
 }
@@ -83,12 +83,12 @@ export function or(...args: Array<IParser2 | string>): IParser {
     for (let i = 0; i < parsers.length; i++) {
       const result = applyParser(parsers[i], input);
 
-      if (result !== noResult) {
+      if (result !== noOutput) {
         return success(result);
       }
     }
     fail(input.getInputData());
-    return noResult;
+    return noOutput;
   });
 }
 
@@ -107,11 +107,11 @@ export function and(...args: Array<IParser2 | string>): IParser {
     for (let i = 0; i < parsers.length; i++) {
       let result = applyParser(parsers[i], input);
 
-      if (result === noResult) {
+      if (result === noOutput) {
         fail(input.getInputData(), {parserIndex: i});
 
         input.setPosition(pos);
-        return noResult;
+        return noOutput;
       }
       else if (result !== '') {
         results.push(result);
@@ -119,6 +119,63 @@ export function and(...args: Array<IParser2 | string>): IParser {
     }
     // console.log('and succeeded');
     return success(results);
+  });
+}
+
+// Array returned doesn't contain '' values.
+// Auto converts plain strings to word parsers.
+export function an2(...args: Array<IParser2 | string>): IParser {
+  const parsers: IParser[] = args.map((arg) => {
+    return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
+  });
+
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
+    const pos = input.getPosition();
+    let outputs: any[] = [];
+
+    for (let i = 0; i < parsers.length; i++) {
+      const parserId = parsers[i].parserId;
+      // console.log(parserId);
+      const startingPos = input.getPosition();
+
+      if (input.parserResultExists(parserId)) {
+        const parserResultData = input.getParserResult(parserId);
+
+        input.setPosition(parserResultData.endingPos);
+
+        if (parserResultData.output === noOutput) {
+          fail(input.getInputData(), {parserIndex: i});
+
+          input.setPosition(pos);
+          return noOutput;
+        }
+        else if (parserResultData.output !== '') {
+          // input.setPosition(parserResultData.endingPos);
+          outputs.push(parserResultData.output);
+        }
+      }
+      else {
+        const output = applyParser(parsers[i], input);
+
+        const success = output !== noOutput;
+
+        if (!success) {
+          fail(input.getInputData(), {parserIndex: i});
+
+          input.setPosition(pos);
+          return noOutput;
+        }
+        else if (output !== '') {
+          outputs.push(output);
+        }
+
+        if (output !== '') {
+          input.saveParserResult(parserId, success, startingPos, output);
+        }
+      }
+    }
+
+    return success(outputs);
   });
 }
 
@@ -130,10 +187,10 @@ export function not(parserIn: string | IParser): IParser {
     const pos = input.getPosition();
     const result = applyParser(parser, input);
 
-    if (result !== noResult) {
+    if (result !== noOutput) {
       input.setPosition(pos);
 
-      return noResult;
+      return noOutput;
     }
     return success('');
   });
@@ -166,7 +223,7 @@ export function many1(parser: IParser2): IParser {
       return success(results);
     }
     fail(input.getInputData());
-    return noResult;
+    return noOutput;
   });
 }
 
@@ -177,20 +234,20 @@ export function repSep(parser: IParser2, separator: string): IParser {
     let sepParser = and(__, word(separator), __);
 
     let result = applyParser(parser, input);
-    while (result !== noResult) {
+    while (result !== noOutput) {
       results.push(result);
 
       let sepRes = applyParser(sepParser, input);
-      if (sepRes !== noResult) {
+      if (sepRes !== noOutput) {
         result = applyParser(parser, input);
       }
       else {
-        result = noResult;
+        result = noOutput;
       }
     }
     // if (results.length === 0) {
     //   fail(input.getInputData());
-    //   return noResult;
+    //   return noOutput;
     // }
 
     return success(results);
@@ -203,20 +260,20 @@ export function repSep2(parser: IParser2, separator: IParser2): IParser {
     // let sepParser = and(__, separator, __);
 
     let result = applyParser(parser, input);
-    while (result !== noResult) {
+    while (result !== noOutput) {
       results.push(result);
 
       let sepRes = applyParser(separator, input);
-      if (sepRes !== noResult) {
+      if (sepRes !== noOutput) {
         result = applyParser(parser, input);
       }
       else {
-        result = noResult;
+        result = noOutput;
       }
     }
     // if (results.length === 0) {
     //   fail(input.getInputData());
-    //   return noResult;
+    //   return noOutput;
     // }
 
     return success(results);

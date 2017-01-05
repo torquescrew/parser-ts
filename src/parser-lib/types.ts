@@ -1,8 +1,19 @@
 import {IInputData, Input} from "../input";
+// import {getNextParserId} from "./parsers-m";
 
+
+let nextParserId = 1;
+
+export function getNextParserId(): number {
+  // console.log('getNextParserId');
+  const parserId = nextParserId;
+  nextParserId++;
+
+  return parserId;
+}
 
 export type NoResult = null;
-export const noResult: NoResult = null;
+export const noOutput: NoResult = null;
 
 export type ParserResult = any;
 
@@ -13,6 +24,7 @@ export interface RawParser {
   apply: (input: Input) => any;
   map: (success: SuccessFunc) => IParser;
   fail: (fail: FailFunc) => IParser;
+  parserId: number;
 }
 
 export type WrappedParser = (() => RawParser);
@@ -22,6 +34,7 @@ export type IParser2 = RawParser | WrappedParser;
 export type IParser = RawParser;
 
 export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure: FailFunc) => any): IParser {
+  // console.log('mkParser');
   let successFuncs: SuccessFunc[] = [];
   let failFunc: FailFunc;
 
@@ -30,7 +43,7 @@ export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure
       return failFunc(inputData, extra);
     }
     else {
-      return noResult;
+      return noOutput;
     }
   };
 
@@ -53,7 +66,8 @@ export function mkParser(applyFunc: (input: Input, success: SuccessFunc, failure
       failFunc = f;
 
       return self;
-    }
+    },
+    parserId: getNextParserId()
   };
 
   return self;

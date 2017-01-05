@@ -1,9 +1,9 @@
 import {checkExprParse, evalCode, checkParse} from "./shared";
 import {ETypes} from "../src/infix-lang/expr-types/expr";
+import {accessObjectElement} from "../src/infix-lang";
 
 
 import "./conditionals";
-import {accessObjectElement} from "../src/infix-lang";
 
 describe('Simple expressions:', function() {
   checkExprParse(ETypes.VariableDefinition, 'let a = 5');
@@ -35,8 +35,8 @@ describe('Lambdas', () => {
 
 describe('Lists', () => {
   checkExprParse(ETypes.List, '[1, 2, 3]');
-  checkExprParse(ETypes.IndexIntoList, '[1, 2, 3][1]');
-  checkExprParse(ETypes.IndexIntoList, 'a[0]');
+  // checkExprParse(ETypes.IndexIntoList, '[1, 2, 3][1]');
+  // checkExprParse(ETypes.IndexIntoList, 'a[0]');
 
   evalCode('let a = [1, 12, 9] a[1]', 12);
   evalCode('let a = [1, 12, 9] a[1] + 2', 14);
