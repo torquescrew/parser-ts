@@ -95,7 +95,7 @@ export function or(...args: Array<IParser2 | string>): IParser {
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
-export function and(...args: Array<IParser2 | string>): IParser {
+export function and2(...args: Array<IParser2 | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
@@ -124,7 +124,7 @@ export function and(...args: Array<IParser2 | string>): IParser {
 
 // Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
-export function an2(...args: Array<IParser2 | string>): IParser {
+export function and(...args: Array<IParser2 | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
   });
@@ -135,10 +135,9 @@ export function an2(...args: Array<IParser2 | string>): IParser {
 
     for (let i = 0; i < parsers.length; i++) {
       const parserId = parsers[i].parserId;
-      // console.log(parserId);
       const startingPos = input.getPosition();
 
-      if (input.parserResultExists(parserId)) {
+      if (parserId && input.parserResultExists(parserId)) {
         const parserResultData = input.getParserResult(parserId);
 
         input.setPosition(parserResultData.endingPos);
@@ -150,7 +149,6 @@ export function an2(...args: Array<IParser2 | string>): IParser {
           return noOutput;
         }
         else if (parserResultData.output !== '') {
-          // input.setPosition(parserResultData.endingPos);
           outputs.push(parserResultData.output);
         }
       }

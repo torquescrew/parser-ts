@@ -56,7 +56,7 @@ export class Input {
     return this.code.slice(this.position);
   }
 
-  saveParserResult(parserId: number, success: boolean, startingPos: number, output: any) {
+  saveParserResult(parserId: number, success: boolean, startingPos: number, output: any): void {
     if (this.parserResultExists(parserId)) {
       return;
     }

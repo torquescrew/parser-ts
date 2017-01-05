@@ -84,7 +84,9 @@ const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
 const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
 
-export const indexIntoList = and(exprWithout('indexIntoList', 'operation', 'accessObjectElement'), '[', fNumber, ']')
+const listLiteral = exprWithout('indexIntoList', 'operation', 'accessObjectElement', 'objectConstructor');
+
+export const indexIntoList = and(listLiteral, '[', fNumber, ']')
   .map(mkIndexIntoList);
 
 
@@ -98,7 +100,6 @@ const objectLiteral = exprWithout('accessObjectElement', 'primitive', 'operation
 
 export const accessObjectElement = and(objectLiteral, '.', identifier)
   .map(mkAccessObjectElement);
-
 
 
 const elseIfConditional = and(fElseIf, __, expr, __, block);
