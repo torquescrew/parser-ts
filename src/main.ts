@@ -3,7 +3,7 @@ import * as path from 'path';
 import {IParser} from "./parser-lib/types";
 import {Input} from "./input";
 import * as fs from 'fs';
-import {applyParser, many} from "./parser-lib/parsers-m";
+import {applyParser2, many} from "./parser-lib/parsers-m";
 import {expr} from "./infix-lang";
 import {toJs} from "./infix-lang/expr-types/expr";
 
@@ -31,7 +31,7 @@ export function makeInputFromFile(filePath: string): Input | null {
 export function parseFile(parser: IParser, fileName: string): string {
   const input = makeInputFromFile(fileName);
   if (input !== null) {
-    const result = applyParser(parser, input);
+    const result = applyParser2(parser, input);
 
     if (result === null) {
       return 'Compile failed.';
