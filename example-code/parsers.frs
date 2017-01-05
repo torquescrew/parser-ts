@@ -1,0 +1,11 @@
+
+def mkInput(code, position) {
+  {
+    code: code
+    position: position
+  }
+}
+
+def advance(input) {
+
+}

@@ -39,3 +39,16 @@ export function objectLiteralToJs(obj: ObjectLiteral): string {
 
   return `{ ${strs.join(', ')} }`;
 }
+
+
+export interface AccessObjectElement {
+  obj: Expr;
+  element: FIdentifier;
+}
+
+export function mkAccessObjectElement(res): AccessObjectElement {
+  return {
+    obj: res[0],
+    element: res[2]
+  };
+}

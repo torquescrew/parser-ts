@@ -15,6 +15,17 @@ export function checkExprParse(type: string, code: string): void {
   });
 }
 
+export function checkParse(parser: any, code: string): void {
+  describe(`"${code}"`, function() {
+    it(`doesn't explode`, function() {
+      const result = parse(parser, code);
+      console.log(result);
+      // assert.equal(result['type'], type);
+    assert.notEqual(result, null);
+    });
+  });
+}
+
 export function evalCode(code: string, result: any): void {
   describe(`"${code}"`, function() {
     it(`=> ${result}`, function() {
@@ -24,3 +35,4 @@ export function evalCode(code: string, result: any): void {
     });
   });
 }
+

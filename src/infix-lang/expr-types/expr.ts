@@ -16,6 +16,7 @@ export const ETypes = {
   FunctionCall: 'FunctionCall',
   List: 'List',
   IndexIntoList: 'IndexIntoList',
+  AccessObjectElement: 'AccessObjectElement',
   Boolean: 'Boolean',
   Number: 'Number',
   String: 'String',

@@ -1,8 +1,9 @@
-import {checkExprParse, evalCode} from "./shared";
+import {checkExprParse, evalCode, checkParse} from "./shared";
 import {ETypes} from "../src/infix-lang/expr-types/expr";
 
 
 import "./conditionals";
+import {accessObjectElement} from "../src/infix-lang";
 
 describe('Simple expressions:', function() {
   checkExprParse(ETypes.VariableDefinition, 'let a = 5');
@@ -45,6 +46,7 @@ describe('Object literals', () => {
   checkExprParse(ETypes.ObjectLiteral, '{ }');
   checkExprParse(ETypes.ObjectLiteral, '{ a: 1 }');
   checkExprParse(ETypes.ObjectLiteral, '{ position: 0 code: "let a = 5" }');
+  checkParse(accessObjectElement, 'a.a');
 });
 
 describe('Function execution', () => {

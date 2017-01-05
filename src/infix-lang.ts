@@ -23,7 +23,7 @@ import {mkLambda} from "./infix-lang/expr-types/lambda";
 import {mkList, mkIndexIntoList} from "./infix-lang/expr-types/list";
 import * as _ from "underscore";
 import {IParser, WrappedParser} from "./parser-lib/types";
-import {mkObjectLiteral} from "./infix-lang/expr-types/object-literal";
+import {mkObjectLiteral, mkAccessObjectElement} from "./infix-lang/expr-types/object-literal";
 
 
 const fTrue = word('true');
@@ -84,6 +84,9 @@ const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
 const listConstructor = and('[', repSep(expr, ','), ']')
   .map(mkList);
 
+export const indexIntoList = and(exprWithout('indexIntoList', 'operation', 'accessObjectElement'), '[', fNumber, ']')
+  .map(mkIndexIntoList);
+
 
 const keyValuePair = and(__, identifier, __, ':', __, expr);
 
@@ -91,8 +94,12 @@ const objectConstructor = and('{', many(keyValuePair), __, '}')
   .map(mkObjectLiteral);
 
 
-export const indexIntoList = and(exprWithout('indexIntoList', 'operation'), '[', fNumber, ']')
-  .map(mkIndexIntoList);
+const objectLiteral = exprWithout('accessObjectElement', 'primitive', 'operation', 'defVar', 'defFun');
+
+export const accessObjectElement = and(objectLiteral, '.', identifier)
+  .map(mkAccessObjectElement);
+
+
 
 const elseIfConditional = and(fElseIf, __, expr, __, block);
 
@@ -117,6 +124,7 @@ export function expr(): IParser {
 function exprWithout(...without: string[]): WrappedParser {
   return () => {
     const parsers = {
+      // accessObjectElement,
       objectConstructor,
       operation,
       indexIntoList,
