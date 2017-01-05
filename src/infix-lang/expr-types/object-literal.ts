@@ -41,13 +41,14 @@ export function objectLiteralToJs(obj: ObjectLiteral): string {
 }
 
 
-export interface AccessObjectElement {
+export interface AccessObjectElement extends Expr {
   obj: Expr;
   element: FIdentifier;
 }
 
 export function mkAccessObjectElement(res): AccessObjectElement {
   return {
+    type: ETypes.AccessObjectElement,
     obj: res[0],
     element: res[2]
   };

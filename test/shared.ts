@@ -1,4 +1,4 @@
-import {expr, block, exprs} from "../src/infix-lang";
+import {expr, exprs} from "../src/infix-lang";
 import {parse} from '../src/parser-lib/parsers-m';
 import {Expr, blockToJs} from "../src/infix-lang/expr-types/expr";
 

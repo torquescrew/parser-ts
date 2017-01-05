@@ -3,9 +3,9 @@ import AceEditor from "react-ace";
 import "brace/mode/javascript";
 import "brace/mode/python";
 import "brace/theme/monokai";
-import {block} from "../src/infix-lang";
 import {parse} from "../src/parser-lib/parsers-m";
 import {blockToJs} from "../src/infix-lang/expr-types/expr";
+import {exprs} from "../src/infix-lang";
 
 
 interface EditorState {
@@ -23,7 +23,7 @@ export default class Editors extends React.Component<{}, EditorState> {
   onCodeChange = (code: string) => {
     const t1 = +new Date();
 
-    const ast = parse(block, `{${code}}`);
+    const ast = parse(exprs, code);
 
     if (ast) {
       const jsCode = blockToJs(ast, false);

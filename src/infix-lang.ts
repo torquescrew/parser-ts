@@ -26,6 +26,8 @@ import {IParser, WrappedParser} from "./parser-lib/types";
 import {mkObjectLiteral, mkAccessObjectElement} from "./infix-lang/expr-types/object-literal";
 
 
+export const expr = exprWithout();
+
 const fTrue = word('true');
 const fFalse = word('false');
 const fLet = word('let');
@@ -56,12 +58,19 @@ const defVar = and(fLet, __, identifier, __, fEquals, __, expr)
   .map(mkDefVar)
   .fail(defVarFail);
 
+const openBrace = char('{');
+const closeBrace = char('}');
+const openParen = char('(');
+const closeParen = char(')');
+const openBrack = char('[');
+const closeBrack = char(']');
+
 export const exprs = repSep2(expr, __);
 
-export const block = and('{', __, exprs, __, '}')
+const block = and(openBrace, __, exprs, __, closeBrace)
   .map(res => res[1]);
 
-const argumentBlock = and('(', __, repSep(identifier, ','), __, ')')
+const argumentBlock = and(openParen, __, repSep(identifier, ','), __, closeParen)
   .map(res => res[1]);
 
 const defFun = and(fFun, __, identifier, __, argumentBlock, __, block)
@@ -71,7 +80,7 @@ const defFun = and(fFun, __, identifier, __, argumentBlock, __, block)
 const lambda = and(argumentBlock, __, fArrow, __, block)
   .map(mkLambda);
 
-const argumentCallBlock = and('(', __, repSep(expr, ','), __, ')')
+const argumentCallBlock = and(openParen, __, repSep(expr, ','), __, closeParen)
   .map(res => res[1]);
 
 const funCall = and(__, identifier, argumentCallBlock)
@@ -81,24 +90,24 @@ const funCall = and(__, identifier, argumentCallBlock)
 const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
   .map(mkFunCallInfix);
 
-const listConstructor = and('[', repSep(expr, ','), ']')
+const listConstructor = and(openBrack, repSep(expr, ','), closeBrack)
   .map(mkList);
 
 const listLiteral = exprWithout('indexIntoList', 'operation', 'accessObjectElement', 'objectConstructor');
 
-export const indexIntoList = and(listLiteral, '[', fNumber, ']')
+const indexIntoList = and(listLiteral, openBrack, fNumber, closeBrack)
   .map(mkIndexIntoList);
 
 
 const keyValuePair = and(__, identifier, __, ':', __, expr);
 
-const objectConstructor = and('{', many(keyValuePair), __, '}')
+const objectConstructor = and(openBrace, many(keyValuePair), __, closeBrace)
   .map(mkObjectLiteral);
 
 
 const objectLiteral = exprWithout('accessObjectElement', 'primitive', 'operation', 'defVar', 'defFun');
 
-export const accessObjectElement = and(objectLiteral, '.', identifier)
+const accessObjectElement = and(objectLiteral, '.', identifier)
   .map(mkAccessObjectElement);
 
 
@@ -110,7 +119,7 @@ const elseConditional = and(__, fElse, __, block);
 const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
   .map(mkConditional);
 
-const bracketed = and('(', __, expr, __, ')')
+const bracketed = and(openParen, __, expr, __, closeParen)
   .map(mkBracketed);
 
 const operableExpr = exprWithout('operation');
@@ -118,9 +127,6 @@ const operableExpr = exprWithout('operation');
 const operation = and(operableExpr, __, many1(and(__, operator, __, operableExpr)))
   .map(mkOperator);
 
-export function expr(): IParser {
-  return exprWithout()();
-}
 
 function exprWithout(...without: string[]): WrappedParser {
   return () => {

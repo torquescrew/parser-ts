@@ -1,5 +1,4 @@
-
-let  a = (3 / 5) + 3 - 5
+let a = (3 / 5) + 3 - 5
 
 a..times(2)
 
@@ -13,7 +12,7 @@ if true {
   let c = 5
 }
 else if (false) {
-
+  let c = 2
 }
 else {
   let c = 9
