@@ -81,7 +81,7 @@ export function or(...args: Array<IParser2 | string>): IParser {
 
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     for (let i = 0; i < parsers.length; i++) {
-      const result = applyParser2(parsers[i], input);
+      const result = applyParser(parsers[i], input);
 
       if (result !== noOutput) {
         return success(result);
@@ -105,7 +105,7 @@ export function and(...args: Array<IParser2 | string>): IParser {
     let results: any[] = [];
 
     for (let i = 0; i < parsers.length; i++) {
-      let result = applyParser2(parsers[i], input);
+      let result = applyParser(parsers[i], input);
 
       if (result === noOutput) {
         fail(input.getInputData(), {parserIndex: i});
@@ -117,70 +117,10 @@ export function and(...args: Array<IParser2 | string>): IParser {
         results.push(result);
       }
     }
-    // console.log('and succeeded');
+
     return success(results);
   });
 }
-
-// Array returned doesn't contain '' values.
-// Auto converts plain strings to word parsers.
-// export function and2(...args: Array<IParser2 | string>): IParser {
-//   const parsers: IParser[] = args.map((arg) => {
-//     return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
-//   });
-//
-//   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
-//     const pos = input.getPosition();
-//     let outputs: any[] = [];
-//
-//     for (let i = 0; i < parsers.length; i++) {
-//       const parser = unwrapParser(parsers[i]);
-//       const parserId = parser.parserId;
-//       const startingPos = input.getPosition();
-//
-//       if (!parserId) {
-//         console.log('missing parser id');
-//       }
-//
-//       if (parserId && input.parserResultExists(parserId)) {
-//         const parserResultData = input.getParserResult(parserId);
-//
-//         input.setPosition(parserResultData.endingPos);
-//
-//         if (parserResultData.output === noOutput) {
-//           fail(input.getInputData(), {parserIndex: i});
-//
-//           input.setPosition(pos);
-//           return noOutput;
-//         }
-//         else if (parserResultData.output !== '') {
-//           outputs.push(parserResultData.output);
-//         }
-//       }
-//       else {
-//         const output = applyParser(parser, input);
-//
-//         const success = output !== noOutput;
-//
-//         if (!success) {
-//           fail(input.getInputData(), {parserIndex: i});
-//
-//           input.setPosition(pos);
-//           return noOutput;
-//         }
-//         else if (output !== '') {
-//           outputs.push(output);
-//         }
-//
-//         if (output !== '') {
-//           input.saveParserResult(parserId, success, startingPos, output);
-//         }
-//       }
-//     }
-//
-//     return success(outputs);
-//   });
-// }
 
 // Doesn't advance position
 export function not(parserIn: string | IParser): IParser {
@@ -188,7 +128,7 @@ export function not(parserIn: string | IParser): IParser {
 
   return mkParser((input: Input, success) => {
     const pos = input.getPosition();
-    const result = applyParser2(parser, input);
+    const result = applyParser(parser, input);
 
     if (result !== noOutput) {
       input.setPosition(pos);
@@ -203,10 +143,10 @@ export function many(parser: IParser2): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
 
-    let result = applyParser2(parser, input);
+    let result = applyParser(parser, input);
     while (result !== null) {
       results.push(result);
-      result = applyParser2(parser, input);
+      result = applyParser(parser, input);
     }
     return success(results);
   });
@@ -216,10 +156,10 @@ export function many1(parser: IParser2): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
 
-    let result = applyParser2(parser, input);
+    let result = applyParser(parser, input);
     while (result !== null) {
       results.push(result);
-      result = applyParser2(parser, input);
+      result = applyParser(parser, input);
     }
 
     if (results.length > 0) {
@@ -236,13 +176,13 @@ export function repSep(parser: IParser2, separator: string): IParser {
     let results: any[] = [];
     let sepParser = and(__, word(separator), __);
 
-    let result = applyParser2(parser, input);
+    let result = applyParser(parser, input);
     while (result !== noOutput) {
       results.push(result);
 
-      let sepRes = applyParser2(sepParser, input);
+      let sepRes = applyParser(sepParser, input);
       if (sepRes !== noOutput) {
-        result = applyParser2(parser, input);
+        result = applyParser(parser, input);
       }
       else {
         result = noOutput;
@@ -256,15 +196,14 @@ export function repSep(parser: IParser2, separator: string): IParser {
 export function repSep2(parser: IParser2, separator: IParser2): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
-    // let sepParser = and(__, separator, __);
 
-    let result = applyParser2(parser, input);
+    let result = applyParser(parser, input);
     while (result !== noOutput) {
       results.push(result);
 
-      let sepRes = applyParser2(separator, input);
+      let sepRes = applyParser(separator, input);
       if (sepRes !== noOutput) {
-        result = applyParser2(parser, input);
+        result = applyParser(parser, input);
       }
       else {
         result = noOutput;
@@ -278,7 +217,7 @@ export function repSep2(parser: IParser2, separator: IParser2): IParser {
 
 export function parseAndPrint(parser: IParser, text: string) {
   let input = new Input(text);
-  let result = applyParser2(parser, input);
+  let result = applyParser(parser, input);
   if (result === null) {
     console.log('Compile failed.');
   }
@@ -289,20 +228,18 @@ export function parseAndPrint(parser: IParser, text: string) {
 
 export function parse(parser: IParser2, code: string) {
   const input = new Input(code);
-  const result = applyParser2(parser, input);
-
-  return result;
+  return applyParser(parser, input);
 }
 
-// export function unwrapParser(parser: IParser2): RawParser {
-//   if (parser['length'] ===0) {
-//     const wrappedParser = parser as WrappedParser;
-//     return wrappedParser();
-//   }
-//   return parser as RawParser;
-// }
+export function unwrapParser(parser: IParser2): RawParser {
+  if (parser['length'] ===0) {
+    const wrappedParser = parser as WrappedParser;
+    return wrappedParser();
+  }
+  return parser as RawParser;
+}
 
-export function applyParser(parser: RawParser, input: Input) {
+export function getParserOutput(parser: RawParser, input: Input) {
   if (input.parserResultExists(parser.parserId)) {
     const res = input.getParserResult(parser.parserId);
     input.setPosition(res.endingPos);
@@ -321,14 +258,8 @@ export function applyParser(parser: RawParser, input: Input) {
   }
 }
 
-export function applyParser2(parser: IParser2, input: Input) {
-  if (parser['length'] === 0) {
-    const wrappedParser = parser as WrappedParser;
-    return wrappedParser().apply(input);
-  }
-  else {
-    const rawParser = parser as RawParser;
-    return applyParser(rawParser, input);
-    // return rawParser.apply(input);
-  }
+export function applyParser(parser: IParser2, input: Input) {
+  const rawParser = unwrapParser(parser);
+
+  return getParserOutput(rawParser, input);
 }
