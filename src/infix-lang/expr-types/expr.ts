@@ -5,7 +5,7 @@ import {FConditional, conditionalToJs} from "./conditionals";
 import {FOperators, operatorsToJs} from "./operation";
 import {lambdaToJs, Lambda} from "./lambda";
 import {listToJs, List, indexIntoListToJs, IndexIntoList} from "./list";
-import {objectLiteralToJs, ObjectLiteral} from "./object-literal";
+import {objectLiteralToJs, ObjectLiteral, accessObjectElementToJs, AccessObjectElement} from "./object-literal";
 
 
 export const ETypes = {
@@ -59,6 +59,8 @@ export function toJs(expr: any): string {
       return lambdaToJs(expr as Lambda);
     case ETypes.ObjectLiteral:
       return objectLiteralToJs(expr as ObjectLiteral);
+    case ETypes.AccessObjectElement:
+      return accessObjectElementToJs(expr as AccessObjectElement);
     case ETypes.List:
       return listToJs(expr as List);
     case ETypes.IndexIntoList:

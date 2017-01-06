@@ -19,9 +19,9 @@ export function checkParse(parser: any, code: string): void {
   describe(`"${code}"`, function() {
     it(`doesn't explode`, function() {
       const result = parse(parser, code);
-      console.log(result);
+      // console.log(result);
       // assert.equal(result['type'], type);
-    assert.notEqual(result, null);
+      assert.notEqual(result, null);
     });
   });
 }

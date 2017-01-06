@@ -53,3 +53,7 @@ export function mkAccessObjectElement(res): AccessObjectElement {
     element: res[2]
   };
 }
+
+export function accessObjectElementToJs(aoe: AccessObjectElement): string {
+  return `${toJs(aoe.obj)}.${toJs(aoe.element)}`;
+}

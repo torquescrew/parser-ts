@@ -13,6 +13,18 @@ interface EditorState {
   outputCode: string;
 }
 
+function transpileCode(code: string): string {
+  const ast = parse(exprs, code);
+
+  if (ast) {
+    const jsCode = blockToJs(ast, false);
+    const beautify = require('js-beautify')['js_beautify'];
+
+    return beautify(jsCode);
+  }
+  return '';
+}
+
 export default class Editors extends React.Component<{}, EditorState> {
 
   state: EditorState = {
@@ -22,21 +34,29 @@ export default class Editors extends React.Component<{}, EditorState> {
 
   onCodeChange = (code: string) => {
     const t1 = +new Date();
+    const jsCode = transpileCode(code);
 
-    const ast = parse(exprs, code);
-
-    if (ast) {
-      const jsCode = blockToJs(ast, false);
-      const beautify = require('js-beautify')['js_beautify'];
-
+    if (jsCode) {
       this.setState({
         code: code,
-        outputCode: beautify(jsCode)
+        outputCode: jsCode
       });
     }
+    localStorage.setItem('code', code);
 
     console.log(+new Date() - t1);
   };
+
+  componentDidMount() {
+    const code = localStorage.getItem('code');
+    if (code) {
+      const jsCode = transpileCode(code);
+      this.setState({
+        code: code,
+        outputCode: jsCode
+      });
+    }
+  }
 
   render() {
     return (

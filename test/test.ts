@@ -20,6 +20,7 @@ describe('Operators:', function() {
   checkExprParse(ETypes.Operators, '5 * 5 + 3');
   checkExprParse(ETypes.Operators, '(5 / 5) + 3 - 5');
   checkExprParse(ETypes.Operators, 'true == false');
+  checkExprParse(ETypes.Operators, 'a.a + 2');
 });
 
 

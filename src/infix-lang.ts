@@ -93,7 +93,11 @@ const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
 const listConstructor = and(openBrack, repSep(expr, ','), closeBrack)
   .map(mkList);
 
-const listLiteral = exprWithout('indexIntoList', 'operation', 'accessObjectElement', 'objectConstructor');
+const listLiteral = exprWithout(
+  'indexIntoList',
+  'operation',
+  'accessObjectElement',
+  'objectConstructor');
 
 const indexIntoList = and(listLiteral, openBrack, fNumber, closeBrack)
   .map(mkIndexIntoList);
@@ -131,9 +135,9 @@ const operation = and(operableExpr, __, many1(and(__, operator, __, operableExpr
 function exprWithout(...without: string[]): WrappedParser {
   return () => {
     const parsers = {
-      accessObjectElement,
       objectConstructor,
       operation,
+      accessObjectElement,
       indexIntoList,
       infixFunCall,
       defVar,
