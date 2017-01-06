@@ -109,7 +109,12 @@ const objectConstructor = and(openBrace, many(keyValuePair), __, closeBrace)
   .map(mkObjectLiteral);
 
 
-const objectLiteral = exprWithout('accessObjectElement', 'primitive', 'operation', 'defVar', 'defFun');
+const objectLiteral = exprWithout(
+  'accessObjectElement',
+  'primitive',
+  'operation',
+  'defVar',
+  'defFun');
 
 const accessObjectElement = and(objectLiteral, '.', identifier)
   .map(mkAccessObjectElement);

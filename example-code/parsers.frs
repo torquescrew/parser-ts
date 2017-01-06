@@ -12,3 +12,20 @@ def advance(input) {
     position: input.position + 1
   }
 }
+
+def setPosition(input, pos) {
+  {
+    code: input.code
+    position: pos
+  }
+}
+
+def nextChar(input) {
+  input.code[input.position]
+}
+
+def char(c) {
+  (input) => {
+
+  }
+}
