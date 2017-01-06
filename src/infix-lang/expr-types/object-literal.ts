@@ -43,17 +43,19 @@ export function objectLiteralToJs(obj: ObjectLiteral): string {
 
 export interface AccessObjectElement extends Expr {
   obj: Expr;
-  element: FIdentifier;
+  elements: FIdentifier[];
 }
 
 export function mkAccessObjectElement(res): AccessObjectElement {
   return {
     type: ETypes.AccessObjectElement,
     obj: res[0],
-    element: res[2]
+    elements: res[2]
   };
 }
 
 export function accessObjectElementToJs(aoe: AccessObjectElement): string {
-  return `${toJs(aoe.obj)}.${toJs(aoe.element)}`;
+  const identifiers = aoe.elements.map(toJs).join('.');
+
+  return `${toJs(aoe.obj)}.${identifiers}`;
 }

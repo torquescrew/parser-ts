@@ -2,7 +2,7 @@ import {
   char,
   word,
   or,
-  and,
+  and2,
   ident,
   not,
   __,
@@ -11,7 +11,7 @@ import {
   stringLiteral,
   number,
   repSep,
-  repSep2
+  repParserSep
 } from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
@@ -51,10 +51,10 @@ const fString = stringLiteral.map(mkString);
 
 const primitive = or(fNumber, fString, fBool);
 
-const identifier = and(not(reserved), ident)
+const identifier = and2(not(reserved), ident)
   .map(mkIdentifier);
 
-const defVar = and(fLet, __, identifier, __, fEquals, __, expr)
+const defVar = and2(fLet, __, identifier, __, fEquals, __, expr)
   .map(mkDefVar)
   .fail(defVarFail);
 
@@ -64,33 +64,36 @@ const openParen = char('(');
 const closeParen = char(')');
 const openBrack = char('[');
 const closeBrack = char(']');
+const colon = char(':');
+const dotDot = word('..');
+const dot = char('.');
 
-export const exprs = repSep2(expr, __);
+export const exprs = repParserSep(expr, __);
 
-const block = and(openBrace, __, exprs, __, closeBrace)
+const block = and2(openBrace, __, exprs, __, closeBrace)
   .map(res => res[1]);
 
-const argumentBlock = and(openParen, __, repSep(identifier, ','), __, closeParen)
+const argumentBlock = and2(openParen, __, repSep(identifier, ','), __, closeParen)
   .map(res => res[1]);
 
-const defFun = and(fFun, __, identifier, __, argumentBlock, __, block)
+const defFun = and2(fFun, __, identifier, __, argumentBlock, __, block)
   .map(mkDefFun)
   .fail(functionDefinitionFail);
 
-const lambda = and(argumentBlock, __, fArrow, __, block)
+const lambda = and2(argumentBlock, __, fArrow, __, block)
   .map(mkLambda);
 
-const argumentCallBlock = and(openParen, __, repSep(expr, ','), __, closeParen)
+const argumentCallBlock = and2(openParen, __, repSep(expr, ','), __, closeParen)
   .map(res => res[1]);
 
-const funCall = and(__, identifier, argumentCallBlock)
+const funCall = and2(__, identifier, argumentCallBlock)
   .map(mkFunctionCall)
   .fail(functionCallFail);
 
-const infixFunCall = and(identifier, '..', identifier, argumentCallBlock)
+const infixFunCall = and2(identifier, dotDot, identifier, argumentCallBlock)
   .map(mkFunCallInfix);
 
-const listConstructor = and(openBrack, repSep(expr, ','), closeBrack)
+const listConstructor = and2(openBrack, repSep(expr, ','), closeBrack)
   .map(mkList);
 
 const listLiteral = exprWithout(
@@ -99,13 +102,13 @@ const listLiteral = exprWithout(
   'accessObjectElement',
   'objectConstructor');
 
-const indexIntoList = and(listLiteral, openBrack, fNumber, closeBrack)
+const indexIntoList = and2(listLiteral, openBrack, fNumber, closeBrack)
   .map(mkIndexIntoList);
 
 
-const keyValuePair = and(__, identifier, __, ':', __, expr);
+const keyValuePair = and2(__, identifier, __, colon, __, expr);
 
-const objectConstructor = and(openBrace, many(keyValuePair), __, closeBrace)
+const objectConstructor = and2(openBrace, many(keyValuePair), __, closeBrace)
   .map(mkObjectLiteral);
 
 
@@ -116,24 +119,24 @@ const objectLiteral = exprWithout(
   'defVar',
   'defFun');
 
-const accessObjectElement = and(objectLiteral, '.', identifier)
+const accessObjectElement = and2(objectLiteral, dot, repParserSep(identifier, dot))
   .map(mkAccessObjectElement);
 
 
-const elseIfConditional = and(fElseIf, __, expr, __, block);
+const elseIfConditional = and2(fElseIf, __, expr, __, block);
 
-const elseConditional = and(__, fElse, __, block);
+const elseConditional = and2(__, fElse, __, block);
 
 // TODO: "many(elseConditional)" should only accept 0 or 1.
-const ifConditional = and(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
+const ifConditional = and2(__, fIf, __, expr, __, block, many(elseIfConditional), many(elseConditional))
   .map(mkConditional);
 
-const bracketed = and(openParen, __, expr, __, closeParen)
+const bracketed = and2(openParen, __, expr, __, closeParen)
   .map(mkBracketed);
 
 const operableExpr = exprWithout('operation');
 
-const operation = and(operableExpr, __, many1(and(__, operator, __, operableExpr)))
+const operation = and2(operableExpr, __, many1(and2(__, operator, __, operableExpr)))
   .map(mkOperator);
 
 

@@ -94,6 +94,35 @@ export function or(...args: Array<IParser2 | string>): IParser {
 
 
 // Array returned doesn't contain '' values.
+export function and2(...parsers: Array<IParser2>): IParser {
+  // const parsers: IParser[] = args.map((arg) => {
+  //   return util.isString(arg) ? word(arg as string) as IParser : arg as IParser;
+  // });
+
+  return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
+    const pos = input.getPosition();
+    let results: any[] = [];
+
+    for (let i = 0; i < parsers.length; i++) {
+      let result = applyParser(parsers[i], input);
+
+      if (result === noOutput) {
+        fail(input.getInputData(), {parserIndex: i});
+
+        input.setPosition(pos);
+        return noOutput;
+      }
+      else if (result !== '') {
+        results.push(result);
+      }
+    }
+
+    return success(results);
+  });
+}
+
+
+// Array returned doesn't contain '' values.
 // Auto converts plain strings to word parsers.
 export function and(...args: Array<IParser2 | string>): IParser {
   const parsers: IParser[] = args.map((arg) => {
@@ -174,7 +203,7 @@ export function many1(parser: IParser2): IParser {
 export function repSep(parser: IParser2, separator: string): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
-    let sepParser = and(__, word(separator), __);
+    let sepParser = and2(__, word(separator), __);
 
     let result = applyParser(parser, input);
     while (result !== noOutput) {
@@ -193,7 +222,7 @@ export function repSep(parser: IParser2, separator: string): IParser {
   });
 }
 
-export function repSep2(parser: IParser2, separator: IParser2): IParser {
+export function repParserSep(parser: IParser2, separator: IParser2): IParser {
   return mkParser((input: Input, success: SuccessFunc, fail: FailFunc) => {
     let results: any[] = [];
 
@@ -213,7 +242,6 @@ export function repSep2(parser: IParser2, separator: IParser2): IParser {
     return success(results);
   });
 }
-
 
 export function parseAndPrint(parser: IParser, text: string) {
   let input = new Input(text);
