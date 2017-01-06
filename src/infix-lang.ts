@@ -96,11 +96,14 @@ const infixFunCall = and2(identifier, dotDot, identifier, argumentCallBlock)
 const listConstructor = and2(openBrack, repSep(expr, ','), closeBrack)
   .map(mkList);
 
-const listLiteral = exprWithout(
-  'indexIntoList',
-  'operation',
-  'accessObjectElement',
-  'objectConstructor');
+const listLiteral = () => or(
+  infixFunCall,
+  funCall,
+  identifier,
+  listConstructor,
+  ifConditional,
+  bracketed,
+);
 
 const indexIntoList = and2(listLiteral, openBrack, fNumber, closeBrack)
   .map(mkIndexIntoList);
@@ -112,7 +115,7 @@ const objectConstructor = and2(openBrace, many(keyValuePair), __, closeBrace)
   .map(mkObjectLiteral);
 
 
-const objectLiteral = exprWithout(
+const possibleObject = exprWithout(
   'objectConstructor',
   'accessObjectElement',
   'lambda',
@@ -123,7 +126,7 @@ const objectLiteral = exprWithout(
   'fNull',
   'listConstructor');
 
-const accessObjectElement = and2(objectLiteral, dot, repParserSep(identifier, dot))
+const accessObjectElement = and2(possibleObject, dot, repParserSep(possibleObject, dot))
   .map(mkAccessObjectElement);
 
 
@@ -138,7 +141,15 @@ const ifConditional = and2(__, fIf, __, expr, __, block, many(elseIfConditional)
 const bracketed = and2(openParen, __, expr, __, closeParen)
   .map(mkBracketed);
 
-const operableExpr = exprWithout('operation');
+const operableExpr = exprWithout(
+  'operation',
+  'objectConstructor',
+  'listConstructor',
+  'defVar',
+  'defFun',
+  'lambda',
+  'fNull'
+);
 
 const operation = and2(operableExpr, __, many1(and2(__, operator, __, operableExpr)))
   .map(mkOperator);

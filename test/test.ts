@@ -46,9 +46,13 @@ describe('Object literals', () => {
   checkExprParse(ETypes.ObjectLiteral, '{ }');
   checkExprParse(ETypes.ObjectLiteral, '{ a: 1 }');
   checkExprParse(ETypes.ObjectLiteral, '{ position: 0 code: "let a = 5" }');
+});
+
+describe('Object element access', () => {
   checkExprParse(ETypes.AccessObjectElement, 'a.b');
   checkExprParse(ETypes.AccessObjectElement, 'a.b.c');
-  // checkExprParse(ETypes.AccessObjectElement, '{ one: 1 }.one');
+  checkExprParse(ETypes.AccessObjectElement, 'a.b[0].c', 'a.b[0].c');
+
 });
 
 describe('Function execution', () => {

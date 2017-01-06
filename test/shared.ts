@@ -1,17 +1,27 @@
 import {expr, exprs} from "../src/infix-lang";
 import {parse} from '../src/parser-lib/parsers-m';
-import {Expr, blockToJs} from "../src/infix-lang/expr-types/expr";
+import {Expr, blockToJs, toJs} from "../src/infix-lang/expr-types/expr";
 
 const assert = require('assert');
 
 
-export function checkExprParse(type: string, code: string): void {
+export function checkExprParse(type: string, code: string, output: string | null = null): void {
   describe(`"${code}"`, function() {
+    let result;
+
     it(`${type}`, function() {
-      const result = parse(expr, code);
-      // console.log(result);
+      result = parse(expr, code);
+
       assert.equal(result['type'], type);
     });
+
+    if (output) {
+      it(`Outputs js "${output}"`, () => {
+        const jsCode = toJs(result);
+
+        assert.equal(jsCode, output);
+      });
+    }
   });
 }
 
