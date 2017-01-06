@@ -113,11 +113,15 @@ const objectConstructor = and2(openBrace, many(keyValuePair), __, closeBrace)
 
 
 const objectLiteral = exprWithout(
+  'objectConstructor',
   'accessObjectElement',
+  'lambda',
   'primitive',
   'operation',
   'defVar',
-  'defFun');
+  'defFun',
+  'fNull',
+  'listConstructor');
 
 const accessObjectElement = and2(objectLiteral, dot, repParserSep(identifier, dot))
   .map(mkAccessObjectElement);
