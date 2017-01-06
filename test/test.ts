@@ -1,8 +1,9 @@
 import {checkExprParse, evalCode, checkParse} from "./shared";
 import {ETypes} from "../src/infix-lang/expr-types/expr";
+import * as conditionals from "./conditionals";
 
 
-import "./conditionals";
+conditionals.run();
 
 describe('Simple expressions:', function() {
   checkExprParse(ETypes.VariableDefinition, 'let a = 5');
@@ -51,6 +52,7 @@ describe('Object literals', () => {
 describe('Object element access', () => {
   checkExprParse(ETypes.AccessObjectElement, 'a.b');
   checkExprParse(ETypes.AccessObjectElement, 'a.b.c');
+  checkExprParse(ETypes.AccessObjectElement, 'a.b[c.d]', 'a.b[c.d]');
   checkExprParse(ETypes.AccessObjectElement, 'a.b[0].c', 'a.b[0].c');
 
 });
@@ -59,4 +61,6 @@ describe('Function execution', () => {
   evalCode('def sqr(x) { x * x } sqr(5)', 25);
   evalCode('let a = (x) => { x + 20 } a(2)', 22);
 });
+
+
 

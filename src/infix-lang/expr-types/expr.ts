@@ -20,6 +20,7 @@ export const ETypes = {
   Boolean: 'Boolean',
   Number: 'Number',
   String: 'String',
+  Null: 'Null',
   Identifier: 'Identifier',
   Conditional: 'Conditional',
   Operators: 'Operators',
@@ -74,6 +75,8 @@ export function toJs(expr: any): string {
     case ETypes.String:
       const fString = expr as FString;
       return fString.value.toString();
+    case ETypes.Null:
+      return 'null';
     case ETypes.Identifier:
       const fIdent = expr as FIdentifier;
       return fIdent.value.toString();
@@ -115,6 +118,14 @@ export function mkBool(res): FBool {
   return {
     type: ETypes.Boolean,
     value: res === 'true'
+  };
+}
+
+export interface FNull extends Expr {}
+
+export function mkNull(res) {
+  return {
+    type: ETypes.Null
   };
 }
 

@@ -1,4 +1,3 @@
-
 def mkInput(code, position) {
   {
     code: code
@@ -26,6 +25,14 @@ def nextChar(input) {
 
 def char(c) {
   (input) => {
+    let r = input..nextChar()
 
+    if r == c {
+      input..advance()
+      c
+    }
+    else {
+      null
+    }
   }
 }

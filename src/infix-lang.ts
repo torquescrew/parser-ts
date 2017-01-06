@@ -15,7 +15,7 @@ import {
 } from "./parser-lib/parsers-m";
 import {defVarFail, mkDefVar} from "./infix-lang/expr-types/variable-definition";
 import {mkFunctionCall, mkFunCallInfix, functionCallFail} from "./infix-lang/expr-types/function-call";
-import {mkBool, mkNumber, mkString, mkIdentifier, mkBracketed} from "./infix-lang/expr-types/expr";
+import {mkBool, mkNumber, mkString, mkIdentifier, mkBracketed, mkNull} from "./infix-lang/expr-types/expr";
 import {mkDefFun, functionDefinitionFail} from "./infix-lang/expr-types/function-definition";
 import {mkConditional} from "./infix-lang/expr-types/conditionals";
 import {mkOperator} from "./infix-lang/expr-types/operation";
@@ -39,7 +39,7 @@ const fIf = word('if');
 const fElseIf = word('else if');
 const fElse = word('else');
 
-const fNull = word('null');
+const fNull = word('null').map(mkNull);
 
 const operator = or(char('+'), char('-'), char('*'), char('/'), char('%'), word('=='));
 
@@ -105,9 +105,10 @@ const listLiteral = () => or(
   bracketed,
 );
 
-const indexIntoList = and2(listLiteral, openBrack, fNumber, closeBrack)
-  .map(mkIndexIntoList);
+const possibleNumber = () => or(fNumber, accessObjectElement, identifier);
 
+const indexIntoList = and2(listLiteral, openBrack, possibleNumber, closeBrack)
+  .map(mkIndexIntoList);
 
 const keyValuePair = and2(__, identifier, __, colon, __, expr);
 
