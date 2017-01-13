@@ -1,7 +1,0 @@
-{
-  "globalDependencies": {
-    "commander": "registry:dt/commander#2.3.0+20160317120654",
-    "jest": "registry:dt/jest#0.9.0+20160914121351",
-    "node": "registry:dt/node#6.0.0+20160909174046"
-  }
-}
